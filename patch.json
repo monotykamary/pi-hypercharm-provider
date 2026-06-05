@@ -1,0 +1,155 @@
+{
+  "deepseek-v4-flash": {
+    "maxTokens": 384000,
+    "thinkingLevelMap": {
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "max"
+    },
+    "compat": {
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "requiresReasoningContentOnAssistantMessages": true
+    }
+  },
+  "deepseek-v4-pro": {
+    "maxTokens": 384000,
+    "thinkingLevelMap": {
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "max"
+    },
+    "compat": {
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "requiresReasoningContentOnAssistantMessages": true
+    }
+  },
+  "gemma-4-26b-a4b-it": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "glm-5": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "glm-5.1": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "gpt-oss-120b": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "kimi-k2.5": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "kimi-k2.6": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "minimax-m2.7": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3.6-flash": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3.6-max": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3.6-plus": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3.7-max": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3-coder-480b-a35b-instruct-int4-mixed-ar": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  },
+  "qwen3-next-80b-a3b-instruct": {
+    "compat": {
+      "thinkingFormat": "openai",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true
+    }
+  }
+}

@@ -1,0 +1,312 @@
+[
+  {
+    "id": "deepseek-v4-flash",
+    "name": "DeepSeek V4 Flash",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.14,
+      "output": 0.28,
+      "cacheRead": 0.0028,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "thinkingLevelMap": {
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "max"
+    },
+    "compat": {
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "requiresReasoningContentOnAssistantMessages": true
+    }
+  },
+  {
+    "id": "deepseek-v4-pro",
+    "name": "DeepSeek V4 Pro",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.435,
+      "output": 0.87,
+      "cacheRead": 0.0036,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "thinkingLevelMap": {
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "max"
+    },
+    "compat": {
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens",
+      "supportsDeveloperRole": true,
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "requiresReasoningContentOnAssistantMessages": true
+    }
+  },
+  {
+    "id": "gemma-4-26b-a4b-it",
+    "name": "Gemma 4 26B A4B",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.116,
+      "output": 0.408,
+      "cacheRead": 0.058,
+      "cacheWrite": 0
+    },
+    "contextWindow": 256000,
+    "maxTokens": 25600
+  },
+  {
+    "id": "glm-5.1",
+    "name": "GLM 5.1",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 1.4,
+      "output": 4.4,
+      "cacheRead": 0.26,
+      "cacheWrite": 0
+    },
+    "contextWindow": 202800,
+    "maxTokens": 8000
+  },
+  {
+    "id": "glm-5",
+    "name": "GLM-5",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.96,
+      "output": 3.036,
+      "cacheRead": 0.48,
+      "cacheWrite": 0
+    },
+    "contextWindow": 202752,
+    "maxTokens": 20275
+  },
+  {
+    "id": "gpt-oss-120b",
+    "name": "GPT-OSS 120B",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.18,
+      "output": 0.61,
+      "cacheRead": 0.09,
+      "cacheWrite": 0
+    },
+    "contextWindow": 131072,
+    "maxTokens": 13107
+  },
+  {
+    "id": "kimi-k2.5",
+    "name": "Kimi K2.5",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.522,
+      "output": 2.69,
+      "cacheRead": 0.261,
+      "cacheWrite": 0
+    },
+    "contextWindow": 262144,
+    "maxTokens": 26214
+  },
+  {
+    "id": "kimi-k2.6",
+    "name": "Kimi K2.6",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.95,
+      "output": 4,
+      "cacheRead": 0.16,
+      "cacheWrite": 0
+    },
+    "contextWindow": 262000,
+    "maxTokens": 8000
+  },
+  {
+    "id": "llama-3.3-70b-instruct",
+    "name": "Llama 3.3 70B Instruct",
+    "reasoning": false,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.523,
+      "output": 0.786,
+      "cacheRead": 0.2615,
+      "cacheWrite": 0
+    },
+    "contextWindow": 128000,
+    "maxTokens": 12800
+  },
+  {
+    "id": "llama-4-maverick-17b-128e-instruct-fp8",
+    "name": "Llama 4 Maverick 17B 128E FP8",
+    "reasoning": false,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.35,
+      "output": 1.08,
+      "cacheRead": 0.175,
+      "cacheWrite": 0
+    },
+    "contextWindow": 430000,
+    "maxTokens": 43000
+  },
+  {
+    "id": "minimax-m2.7",
+    "name": "MiniMax M2.7",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.44,
+      "output": 1.76,
+      "cacheRead": 0.22,
+      "cacheWrite": 0
+    },
+    "contextWindow": 204800,
+    "maxTokens": 20480
+  },
+  {
+    "id": "qwen3-coder-480b-a35b-instruct-int4-mixed-ar",
+    "name": "Qwen3 Coder 480B A35B INT4",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.801,
+      "output": 2.185,
+      "cacheRead": 0.4005,
+      "cacheWrite": 0
+    },
+    "contextWindow": 106000,
+    "maxTokens": 10600
+  },
+  {
+    "id": "qwen3-next-80b-a3b-instruct",
+    "name": "Qwen3 Next 80B A3B",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.1295,
+      "output": 1.216,
+      "cacheRead": 0.0648,
+      "cacheWrite": 0
+    },
+    "contextWindow": 262144,
+    "maxTokens": 26214
+  },
+  {
+    "id": "qwen3.6-flash",
+    "name": "Qwen3.6-Flash",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 1,
+      "output": 4,
+      "cacheRead": 1.25,
+      "cacheWrite": 0.1
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 64000
+  },
+  {
+    "id": "qwen3.6-max",
+    "name": "Qwen3.6-Max",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 2,
+      "output": 12,
+      "cacheRead": 2.5,
+      "cacheWrite": 0.2
+    },
+    "contextWindow": 256000,
+    "maxTokens": 64000
+  },
+  {
+    "id": "qwen3.6-plus",
+    "name": "Qwen3.6-Plus",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 2,
+      "output": 6,
+      "cacheRead": 2.5,
+      "cacheWrite": 0.2
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 64000
+  },
+  {
+    "id": "qwen3.7-max",
+    "name": "Qwen3.7-Max",
+    "reasoning": true,
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 2.5,
+      "output": 7.5,
+      "cacheRead": 3.125,
+      "cacheWrite": 0.25
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 64000
+  }
+]

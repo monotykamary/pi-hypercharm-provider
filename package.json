@@ -1,0 +1,37 @@
+{
+  "name": "pi-hypercharm-provider",
+  "version": "1.0.0",
+  "description": "HyperCharm provider extension for pi - Access DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, and GPT-OSS models through the Charm Hyper API",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "clean": "echo 'nothing to clean'",
+    "build": "echo 'nothing to build'",
+    "check": "echo 'nothing to check'",
+    "update-models": "node scripts/update-models.js"
+  },
+  "keywords": [
+    "pi",
+    "extension",
+    "provider",
+    "hypercharm",
+    "charm",
+    "hyper",
+    "ai",
+    "llm",
+    "kimi",
+    "deepseek",
+    "glm",
+    "qwen",
+    "minimax",
+    "gemma",
+    "gpt-oss"
+  ],
+  "author": "",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
