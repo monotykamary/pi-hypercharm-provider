@@ -70,9 +70,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.116,
-      "output": 0.408,
-      "cacheRead": 0.058,
+      "input": 0.102,
+      "output": 0.394,
+      "cacheRead": 0.051,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -93,7 +93,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 202800,
-    "maxTokens": 8000
+    "maxTokens": 64000
   },
   {
     "id": "glm-5",
@@ -103,9 +103,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.96,
-      "output": 3.036,
-      "cacheRead": 0.48,
+      "input": 0.92,
+      "output": 2.976,
+      "cacheRead": 0.46,
       "cacheWrite": 0
     },
     "contextWindow": 202752,
@@ -119,9 +119,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.18,
-      "output": 0.61,
-      "cacheRead": 0.09,
+      "input": 0.178,
+      "output": 0.68,
+      "cacheRead": 0.089,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -159,7 +159,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 262000,
-    "maxTokens": 8000
+    "maxTokens": 262000
   },
   {
     "id": "llama-3.3-70b-instruct",
@@ -169,9 +169,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.523,
-      "output": 0.786,
-      "cacheRead": 0.2615,
+      "input": 0.614,
+      "output": 0.864,
+      "cacheRead": 0.307,
       "cacheWrite": 0
     },
     "contextWindow": 128000,
@@ -201,13 +201,13 @@
       "text"
     ],
     "cost": {
-      "input": 0.44,
-      "output": 1.76,
-      "cacheRead": 0.22,
-      "cacheWrite": 0
+      "input": 0.3,
+      "output": 1.2,
+      "cacheRead": 0.06,
+      "cacheWrite": 0.375
     },
     "contextWindow": 204800,
-    "maxTokens": 20480
+    "maxTokens": 131000
   },
   {
     "id": "qwen3-coder-480b-a35b-instruct-int4-mixed-ar",
@@ -217,9 +217,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.801,
-      "output": 2.185,
-      "cacheRead": 0.4005,
+      "input": 0.655,
+      "output": 2.595,
+      "cacheRead": 0.3275,
       "cacheWrite": 0
     },
     "contextWindow": 106000,
@@ -233,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.1295,
-      "output": 1.216,
-      "cacheRead": 0.0648,
+      "input": 0.1175,
+      "output": 1.136,
+      "cacheRead": 0.0588,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
