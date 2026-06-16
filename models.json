@@ -308,5 +308,21 @@
     },
     "contextWindow": 1000000,
     "maxTokens": 64000
+  },
+  {
+    "id": "qwen3.7-plus",
+    "name": "Qwen3.7-Plus",
+    "reasoning": true,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 1.2,
+      "output": 4.8,
+      "cacheRead": 1.5,
+      "cacheWrite": 0.12
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 64000
   }
 ]
