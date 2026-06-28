@@ -48,7 +48,8 @@ function saveJson(filePath, data) {
 function convertPricing(v) {
   if (!v) return 0;
   const n = typeof v === 'string' ? parseFloat(v) : v;
-  return Math.round(n * 10000) / 10000;
+  // API returns $/M directly; round to 6 decimals to preserve sub-cent cache prices.
+  return Math.round(n * 1e6) / 1e6;
 }
 
 // ─── Patch application ────────────────────────────────────────────────────────

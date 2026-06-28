@@ -208,7 +208,8 @@ function transformApiModel(apiModel: any): JsonModel | null {
   const cost = apiModel.cost?.usd || {};
   const toPerM = (v: any) => {
     const n = typeof v === "string" ? parseFloat(v) : (v || 0);
-    return Math.round(n * 10000) / 10000;
+    // API returns $/M directly; round to 6 decimals to preserve sub-cent cache prices.
+    return Math.round(n * 1e6) / 1e6;
   };
 
   return {
