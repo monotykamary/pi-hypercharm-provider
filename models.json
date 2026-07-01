@@ -70,9 +70,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.126,
-      "output": 0.42,
-      "cacheRead": 0.063,
+      "input": 0.116,
+      "output": 0.408,
+      "cacheRead": 0.058,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -103,9 +103,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.86,
-      "output": 2.784,
-      "cacheRead": 0.43,
+      "input": 0.92,
+      "output": 2.846,
+      "cacheRead": 0.46,
       "cacheWrite": 0
     },
     "contextWindow": 202752,
@@ -119,13 +119,13 @@
       "text"
     ],
     "cost": {
-      "input": 1.5,
-      "output": 4.5,
-      "cacheRead": 0.3,
+      "input": 1.4,
+      "output": 4.4,
+      "cacheRead": 0.26,
       "cacheWrite": 0
     },
-    "contextWindow": 1000000,
-    "maxTokens": 128000
+    "contextWindow": 1048576,
+    "maxTokens": 131072
   },
   {
     "id": "gpt-oss-120b",
@@ -135,9 +135,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.168,
-      "output": 0.562,
-      "cacheRead": 0.084,
+      "input": 0.178,
+      "output": 0.68,
+      "cacheRead": 0.089,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -152,9 +152,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.51,
-      "output": 2.67,
-      "cacheRead": 0.255,
+      "input": 0.471,
+      "output": 2.505,
+      "cacheRead": 0.2355,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
