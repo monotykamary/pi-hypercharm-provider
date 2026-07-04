@@ -35,7 +35,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | GPT-OSS 120B | Text | 131K | 13K | $0.18 | $0.68 |
 | Kimi K2.5 | Text + Image | 262K | 26K | $0.51 | $2.67 |
 | Kimi K2.6 | Text + Image | 262K | 262K | $0.95 | $4.00 |
-| Kimi K2.7 Code | Text | 256K | 33K | $0.95 | $4.00 |
+| Kimi K2.7 Code | Text | 262K | 262K | $0.95 | $4.00 |
 | Llama 3.3 70B Instruct | Text | 128K | 13K | $0.61 | $1.04 |
 | Llama 4 Maverick 17B 128E FP8 | Text | 430K | 43K | $0.27 | $0.89 |
 | MiniMax M2.7 | Text | 205K | 131K | $0.30 | $1.20 |
