@@ -27,7 +27,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | Model | Type | Context | Max Tokens | Input Cost | Output Cost |
 |-------|------|---------|------------|------------|-------------|
 | DeepSeek V4 Flash | Text | 1.0M | 384K | $0.14 | $0.28 |
-| DeepSeek V4 Pro | Text | 1.0M | 384K | $0.43 | $0.87 |
+| DeepSeek V4 Pro | Text | 1.0M | 384K | $1.74 | $3.48 |
 | Gemma 4 26B A4B | Text + Image | 256K | 26K | $0.12 | $0.41 |
 | GLM 5.1 | Text + Image | 202K | 202K | $1.30 | $4.30 |
 | GLM-5 | Text | 203K | 20K | $0.91 | $2.84 |

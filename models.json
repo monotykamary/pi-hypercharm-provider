@@ -9,7 +9,7 @@
     "cost": {
       "input": 0.14,
       "output": 0.28,
-      "cacheRead": 0.0028,
+      "cacheRead": 0.03,
       "cacheWrite": 0.0028
     },
     "contextWindow": 1000000,
@@ -38,9 +38,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.435,
-      "output": 0.87,
-      "cacheRead": 0.0036,
+      "input": 1.74,
+      "output": 3.48,
+      "cacheRead": 0.15,
       "cacheWrite": 0.0036
     },
     "contextWindow": 1000000,
