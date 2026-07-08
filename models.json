@@ -178,7 +178,7 @@
     "maxTokens": 262000
   },
   {
-    "id": "kimi-k2.7",
+    "id": "kimi-k2.7-code",
     "name": "Kimi K2.7 Code",
     "reasoning": true,
     "input": [
