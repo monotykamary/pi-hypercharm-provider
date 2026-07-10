@@ -70,9 +70,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.122,
-      "output": 0.428,
-      "cacheRead": 0.061,
+      "input": 0.12,
+      "output": 0.426,
+      "cacheRead": 0.06,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -103,9 +103,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.85,
-      "output": 2.72,
-      "cacheRead": 0.425,
+      "input": 0.77,
+      "output": 2.388,
+      "cacheRead": 0.385,
       "cacheWrite": 0
     },
     "contextWindow": 202752,
@@ -135,9 +135,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.178,
-      "output": 0.68,
-      "cacheRead": 0.089,
+      "input": 0.18,
+      "output": 0.61,
+      "cacheRead": 0.09,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -152,9 +152,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.518,
-      "output": 2.72,
-      "cacheRead": 0.259,
+      "input": 0.477,
+      "output": 2.535,
+      "cacheRead": 0.2385,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -188,10 +188,10 @@
       "input": 0.95,
       "output": 4,
       "cacheRead": 0.16,
-      "cacheWrite": 0
+      "cacheWrite": 0.19
     },
     "contextWindow": 262000,
-    "maxTokens": 32768
+    "maxTokens": 262000
   },
   {
     "id": "llama-3.3-70b-instruct",
