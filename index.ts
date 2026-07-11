@@ -178,7 +178,7 @@ function buildModels(base: JsonModel[], custom: JsonModel[], patch: PatchData): 
       }
       if (!model.thinkingLevelMap) {
         model.thinkingLevelMap = {
-          minimal: null, low: null, medium: null, high: "high", xhigh: "max",
+          minimal: null, low: null, medium: null, high: "high", xhigh: "max", max: "max",
         };
       }
     }
