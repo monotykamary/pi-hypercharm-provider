@@ -174,7 +174,7 @@ function transformModel(apiModel, existingModelsMap) {
   if (isDeepSeek && isReasoning) {
     model.maxTokens = 384000;
     model.thinkingLevelMap = {
-      minimal: null, low: null, medium: null, high: 'high', xhigh: 'max',
+      minimal: null, low: null, medium: null, high: 'high', max: 'max',
     };
     model.compat = {
       thinkingFormat: 'deepseek',

@@ -6,7 +6,6 @@
       "low": null,
       "medium": null,
       "high": "high",
-      "xhigh": "max",
       "max": "max"
     },
     "compat": {
@@ -25,7 +24,6 @@
       "low": null,
       "medium": null,
       "high": "high",
-      "xhigh": "max",
       "max": "max"
     },
     "compat": {
