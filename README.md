@@ -15,7 +15,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 
 ## Features
 
-- **21+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **22+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format with `reasoning_effort` and 384K max output for DeepSeek V4 models
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **Cost Tracking** with per-model pricing from the API
@@ -45,6 +45,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | Qwen3.6-Flash | Text + Image | 1.0M | 64K | $1.00 | $4.00 |
 | Qwen3.6-Max | Text + Image | 256K | 64K | $2.00 | $12.00 |
 | Qwen3.6-Plus | Text + Image | 1.0M | 64K | $2.00 | $6.00 |
+| Qwen3.7-Flash | Text | 1.0M | 64K | Free | Free |
 | Qwen3.7-Max | Text + Image | 1.0M | 64K | $2.50 | $7.50 |
 | Qwen3.7-Plus | Text | 1.0M | 64K | $1.20 | $4.80 |
 *Costs are per million tokens. Prices subject to change — check [hyper.charm.land](https://hyper.charm.land) for current pricing.*

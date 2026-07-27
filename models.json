@@ -341,6 +341,22 @@
     "maxTokens": 64000
   },
   {
+    "id": "qwen3.7-flash",
+    "name": "Qwen3.7-Flash",
+    "reasoning": false,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 64000
+  },
+  {
     "id": "qwen3.7-max",
     "name": "Qwen3.7-Max",
     "reasoning": true,
