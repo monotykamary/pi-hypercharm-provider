@@ -15,7 +15,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 
 ## Features
 
-- **22+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **23+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format with `reasoning_effort` and 384K max output for DeepSeek V4 models
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **Cost Tracking** with per-model pricing from the API
@@ -40,6 +40,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | Llama 3.3 70B Instruct | Text | 128K | 13K | $0.61 | $1.04 |
 | Llama 4 Maverick 17B 128E FP8 | Text | 430K | 43K | $0.28 | $0.93 |
 | MiniMax M2.7 | Text | 205K | 20K | $0.42 | $1.56 |
+| MiniMax M3 | Text | 512K | 512K | Free | Free |
 | Qwen3 Coder 480B A35B INT4 | Text | 106K | 11K | $0.60 | $2.08 |
 | Qwen3 Next 80B A3B | Text | 262K | 26K | $0.12 | $1.14 |
 | Qwen3.6-Flash | Text + Image | 1.0M | 64K | $1.00 | $4.00 |
