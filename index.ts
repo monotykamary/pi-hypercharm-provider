@@ -4,13 +4,11 @@
  * Registers HyperCharm (hyper.charm.land) as a custom provider using the
  * openai-completions API. Base URL: https://hyper.charm.land/v1
  *
- * HyperCharm provides hyperoptimized coding models via an OpenAI-compatible API.
- * The /v1/models endpoint returns structured metadata including reasoning flags,
- * pricing, context windows, and max output tokens.
- *
- * Note: The API's `supports_reasoning` flag is unreliable for some models (e.g.,
- * it reports true for Llama 3.3 70B which doesn't support extended thinking).
- * The models.json embeds curated reasoning flags; patch.json corrects compat.
+ * Model metadata comes from Charm's typed official-catalog endpoint,
+ * /v1/provider, matching @charmland/pi-hyper-provider. It provides canonical
+ * names, pricing, context and output limits, reasoning levels, and attachment
+ * support. patch.json remains available for verified endpoint regressions, but
+ * currently contains no overrides.
  *
  * Model resolution strategy: Stale-While-Revalidate
  *   1. Serve stale immediately: disk cache → embedded models.json (zero-latency)
@@ -114,6 +112,9 @@ function applyPatch(model: JsonModel, patch: PatchEntry): JsonModel {
   if (!result.reasoning && result.compat?.thinkingFormat) {
     delete result.compat.thinkingFormat;
   }
+  if (!result.reasoning && result.thinkingLevelMap) {
+    delete result.thinkingLevelMap;
+  }
   if (result.compat && Object.keys(result.compat).length === 0) {
     delete result.compat;
   }
@@ -153,81 +154,76 @@ function buildModels(base: JsonModel[], custom: JsonModel[], patch: PatchData): 
     }
   }
 
-  const result = Array.from(modelMap.values());
-
-  // Ensure DeepSeek reasoning models have required compat settings.
-  // Live-fetched models from the SWR pipeline may not have these set.
-  for (const model of result) {
-    if (!model.reasoning) continue;
-    if (isDeepSeekModel(model.id)) {
-      if (!model.compat) {
-        model.compat = {
-          thinkingFormat: "deepseek",
-          maxTokensField: "max_tokens",
-          supportsDeveloperRole: true,
-          supportsStore: false,
-          supportsReasoningEffort: true,
-          requiresReasoningContentOnAssistantMessages: true,
-        };
-      } else {
-        if (model.compat.thinkingFormat === undefined) {
-          model.compat.thinkingFormat = "deepseek";
-        }
-        if (model.compat.supportsReasoningEffort === undefined) {
-          model.compat.supportsReasoningEffort = true;
-        }
-        if ((model.compat as any).requiresReasoningContentOnAssistantMessages === undefined) {
-          (model.compat as any).requiresReasoningContentOnAssistantMessages = true;
-        }
-      }
-      if (!model.thinkingLevelMap) {
-        model.thinkingLevelMap = {
-          minimal: null, low: null, medium: null, high: "high", max: "max",
-        };
-      }
-    }
-  }
-
-  return result;
-}
-
-function isDeepSeekModel(id: string): boolean {
-  return /^deepseek-v/.test(id);
+  return Array.from(modelMap.values());
 }
 
 // ─── Stale-While-Revalidate Model Sync ────────────────────────────────────────
 
 const PROVIDER_ID = "hypercharm";
 const BASE_URL = "https://hyper.charm.land/v1";
-const MODELS_URL = `${BASE_URL}/models`;
+const MODELS_URL = `${BASE_URL}/provider`;
 const CACHE_DIR = path.join(getAgentDir(), "cache");
 const CACHE_PATH = path.join(CACHE_DIR, `${PROVIDER_ID}-models.json`);
 const LIVE_FETCH_TIMEOUT_MS = 8000;
 
-/** Transform a model from the HyperCharm /v1/models API to JsonModel format. */
-function transformApiModel(apiModel: any): JsonModel | null {
-  if (!apiModel.id) return null;
+const PI_THINKING_LEVELS = ["minimal", "low", "medium", "high", "xhigh", "max"] as const;
 
-  const cost = apiModel.cost?.usd || {};
-  const toPerM = (v: any) => {
-    const n = typeof v === "string" ? parseFloat(v) : (v || 0);
-    // API returns $/M directly; round to 6 decimals to preserve sub-cent cache prices.
-    return Math.round(n * 1e6) / 1e6;
+const ON_OFF_THINKING_LEVEL_MAP: Record<string, string | null> = {
+  off: "off",
+  minimal: null,
+  low: null,
+  medium: null,
+  high: null,
+  xhigh: null,
+  max: "max",
+};
+
+function buildThinkingLevelMap(levels: string[]): Record<string, string | null> | undefined {
+  if (levels.length === 0) return undefined;
+  const available = new Set(levels);
+  const result: Record<string, string | null> = {
+    off: available.has("off") ? "off" : available.has("none") ? "none" : null,
   };
+  for (const level of PI_THINKING_LEVELS) {
+    result[level] = available.has(level) ? level : null;
+  }
+  return result;
+}
+
+/** Transform a model from Charm's official typed Hyper /v1/provider catalog. */
+function transformApiModel(apiModel: any): JsonModel | null {
+  if (typeof apiModel.id !== "string" || apiModel.id.length === 0) return null;
+
+  const reasoningLevels = Array.isArray(apiModel.reasoning_levels)
+    ? apiModel.reasoning_levels.filter((level: any) => typeof level === "string")
+    : [];
+  const supportsReasoningEffort = reasoningLevels.length > 0;
+  const thinkingLevelMap = supportsReasoningEffort
+    ? buildThinkingLevelMap(reasoningLevels)
+    : apiModel.can_reason === true
+      ? ON_OFF_THINKING_LEVEL_MAP
+      : undefined;
 
   return {
     id: apiModel.id,
-    name: apiModel.display_name || apiModel.id,
-    reasoning: false, // API supports_reasoning is unreliable; patch.json corrects
-    input: ["text"],
+    name: apiModel.name || apiModel.id,
+    reasoning: apiModel.can_reason === true,
+    thinkingLevelMap,
+    input: apiModel.supports_attachments === true ? ["text", "image"] : ["text"],
     cost: {
-      input: toPerM(cost["1m_in"]),
-      output: toPerM(cost["1m_out"]),
-      cacheRead: toPerM(cost["1m_in_cache"]),
-      cacheWrite: toPerM(cost["1m_out_cache"]),
+      input: apiModel.cost_per_1m_in || 0,
+      output: apiModel.cost_per_1m_out || 0,
+      cacheRead: apiModel.cost_per_1m_in_cached || 0,
+      cacheWrite: 0,
     },
     contextWindow: apiModel.context_window || 0,
-    maxTokens: apiModel.max_output_tokens || 0,
+    maxTokens: apiModel.default_max_tokens || apiModel.context_window || 0,
+    compat: {
+      supportsStore: false,
+      supportsReasoningEffort,
+      thinkingFormat: "deepseek",
+      maxTokensField: "max_tokens",
+    },
   };
 }
 
@@ -239,7 +235,7 @@ async function fetchLiveModels(apiKey: string, signal?: AbortSignal): Promise<Js
     });
     if (!response.ok) return null;
     const data = await response.json();
-    const apiModels = Array.isArray(data) ? data : (data.data || []);
+    const apiModels = Array.isArray(data) ? data : (data.models || data.data || []);
     if (!Array.isArray(apiModels) || apiModels.length === 0) return null;
     return apiModels.map(transformApiModel).filter((m): m is JsonModel => m !== null);
   } catch {
@@ -273,20 +269,13 @@ function mergeWithEmbedded(liveModels: JsonModel[], embeddedModels: JsonModel[])
     const embedded = embeddedMap.get(liveModel.id);
     seen.add(liveModel.id);
     if (embedded) {
-      // Self-heal: live API pricing is authoritative field-by-field. Prefer the
-      // live cost when the API reports it (non-zero); fall back to embedded when
-      // the API is silent (0) so curated cacheRead/cacheWrite isn't clobbered and
-      // providers whose /models endpoint exposes no pricing keep their curated
-      // cost. Curation (reasoning/input/compat/name) still wins via ...embedded.
+      // The official /v1/provider catalog is authoritative for pricing, including
+      // legitimately zero-priced preview models. Curation (reasoning/input/compat/name)
+      // still wins via ...embedded.
       result.push({
         ...liveModel,
         ...embedded,
-        cost: {
-          input: liveModel.cost.input || embedded.cost.input,
-          output: liveModel.cost.output || embedded.cost.output,
-          cacheRead: liveModel.cost.cacheRead || embedded.cost.cacheRead,
-          cacheWrite: liveModel.cost.cacheWrite || embedded.cost.cacheWrite,
-        },
+        cost: liveModel.cost,
         contextWindow: liveModel.contextWindow || embedded.contextWindow,
       });
     } else {

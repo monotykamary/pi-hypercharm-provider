@@ -15,40 +15,41 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 
 ## Features
 
-- **23+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
-- **DeepSeek Native Thinking** — Uses the `deepseek` thinking format with `reasoning_effort` and 384K max output for DeepSeek V4 models
+- **24+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
-- **Cost Tracking** with per-model pricing from the API
-- **Reasoning Models** with `reasoning_effort` parameter support on select models
-- **Vision Support** for image-capable models (Kimi K2.5/K2.6, GLM 5.1, Qwen3.6/3.7, Gemma 4)
+- **Official Catalog Sync** from Charm's typed `/v1/provider` endpoint, matching `@charmland/pi-hyper-provider`
+- **Reasoning Models** with provider-published on/off states and exact effort levels
+- **Attachment Support** for models the official catalog marks as attachment-capable
 
 ## Available Models
 
 | Model | Type | Context | Max Tokens | Input Cost | Output Cost |
 |-------|------|---------|------------|------------|-------------|
 | DeepSeek V4 Flash | Text | 1.0M | 384K | $0.20 | $0.40 |
+| DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.15 | $0.30 |
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
-| Gemma 4 26B A4B | Text + Image | 256K | 26K | $0.12 | $0.41 |
-| GLM 5.1 | Text + Image | 203K | 131K | $1.40 | $4.40 |
-| GLM-5 | Text | 203K | 20K | $0.81 | $2.59 |
+| Gemma 4 26B A4B | Text | 256K | 26K | $0.13 | $0.43 |
+| GLM-5 | Text | 203K | 20K | $0.85 | $2.62 |
+| GLM-5.1 | Text | 203K | 131K | $1.52 | $4.79 |
 | GLM-5.2 | Text | 1.0M | 128K | $1.40 | $4.40 |
-| GPT-OSS 120B | Text | 131K | 13K | $0.17 | $0.56 |
-| Kimi K2.5 | Text + Image | 262K | 26K | $0.52 | $2.72 |
+| gpt-oss-120b | Text | 131K | 13K | $0.19 | $0.70 |
+| Kimi K2.5 | Text | 262K | 26K | $0.56 | $2.82 |
 | Kimi K2.6 | Text + Image | 262K | 262K | $0.95 | $4.00 |
-| Kimi K2.7 Code | Text | 256K | 16K | $0.95 | $4.00 |
-| Kimi K3 | Text | 1.0M | 131K | Free | Free |
-| Llama 3.3 70B Instruct | Text | 128K | 13K | $0.61 | $1.04 |
-| Llama 4 Maverick 17B 128E FP8 | Text | 430K | 43K | $0.28 | $0.93 |
-| MiniMax M2.7 | Text | 205K | 20K | $0.42 | $1.56 |
-| MiniMax M3 | Text | 512K | 512K | Free | Free |
-| Qwen3 Coder 480B A35B INT4 | Text | 106K | 11K | $0.60 | $2.08 |
-| Qwen3 Next 80B A3B | Text | 262K | 26K | $0.12 | $1.14 |
+| Kimi K2.7 Code | Text + Image | 256K | 16K | $0.95 | $4.00 |
+| Kimi K3 | Text + Image | 1.0M | 131K | $3.27 | $16.33 |
+| Llama 3.3 70B Instruct | Text | 128K | 13K | $0.51 | $1.04 |
+| Llama 4 Maverick 17B 128E Instruct FP8 | Text | 430K | 43K | $0.28 | $0.93 |
+| MiniMax M2.7 | Text | 205K | 20K | $0.44 | $1.72 |
+| MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
+| Qwen3 Coder 480B A35B Instruct INT4 Mixed AR | Text | 106K | 11K | $0.57 | $2.13 |
+| Qwen3 Next 80B A3B Instruct | Text | 262K | 26K | $0.12 | $1.14 |
 | Qwen3.6-Flash | Text + Image | 1.0M | 64K | $1.00 | $4.00 |
-| Qwen3.6-Max | Text + Image | 256K | 64K | $2.00 | $12.00 |
+| Qwen3.6-Max | Text | 256K | 64K | $2.00 | $12.00 |
 | Qwen3.6-Plus | Text + Image | 1.0M | 64K | $2.00 | $6.00 |
-| Qwen3.7-Flash | Text | 1.0M | 64K | Free | Free |
-| Qwen3.7-Max | Text + Image | 1.0M | 64K | $2.50 | $7.50 |
-| Qwen3.7-Plus | Text | 1.0M | 64K | $1.20 | $4.80 |
+| Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
+| Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
+| Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
 *Costs are per million tokens. Prices subject to change — check [hyper.charm.land](https://hyper.charm.land) for current pricing.*
 
 ## Installation
@@ -118,7 +119,7 @@ For reasoning models that support `reasoning_effort`, control thinking depth:
 pi --provider hypercharm --model deepseek-v4-pro --reasoning-effort max
 ```
 
-Values: `none`, `low`, `medium`, `high`, `max`
+Supported levels are model-specific and come from Charm's `/v1/provider` catalog (for example `low`/`medium`/`high` on Kimi K2.6). Models with no published levels support the Hyper thinking on state through Pi's `max` level.
 
 ### Thinking Mode
 
@@ -156,37 +157,21 @@ Add to your pi configuration for automatic loading:
 }
 ```
 
-### Compat Settings
+### Catalog and Compat Settings
 
-Charm Hyper uses an OpenAI-compatible API. Compatibility settings are managed via `patch.json`:
+Model metadata matches Charm's official [`@charmland/pi-hyper-provider`](https://github.com/charmbracelet/pi-hyper-provider) transform:
 
-**DeepSeek models** use the `deepseek` thinking format (identical to the native DeepSeek API):
+- canonical `/v1/provider` names, prices, context windows, output caps, attachment flags, and `can_reason`
+- `thinkingFormat: "deepseek"`, which maps Pi thinking levels onto Hyper's `thinking` envelope
+- `reasoning_effort` only when the catalog publishes concrete level names
+- `maxTokensField: "max_tokens"` and `supportsStore: false`
+- zero `cacheWrite`, because Hyper reports discounted cached-output pricing, not cache-write cost
 
-- **`thinkingFormat: "deepseek"`** — Sends `thinking: {type: "enabled/disabled"}` to toggle thinking mode
-- **`supportsReasoningEffort: true`** — Supports `reasoning_effort: "high" | "max"` via `thinkingLevelMap`
-- **`requiresReasoningContentOnAssistantMessages: true`** — Replayed assistant messages include empty `reasoning_content` when reasoning is enabled
-- **`maxTokensField: "max_tokens"`** — Uses `max_tokens` (not `max_completion_tokens`)
-
-**Other reasoning models** (GLM, Kimi, Qwen, MiniMax, Gemma, GPT-OSS) use the `openai` thinking format:
-
-- **`thinkingFormat: "openai"`** — Returns `reasoning_content` in OpenAI format
-- **`supportsReasoningEffort: true`** — Accepts `reasoning_effort` parameter on supported models
-- **`maxTokensField: "max_tokens"`** — Uses `max_tokens` (not `max_completion_tokens`)
-- **`supportsDeveloperRole: true`** — Developer role messages are accepted
-- **`supportsStore: false`** — The `store` parameter is not supported
-
-> **Note:** The HyperCharm `/v1/models` endpoint reports `supports_reasoning: true` for all models,
-> including those that don't natively support extended thinking (e.g., Llama 3.3 70B). `models.json`
-> curates reasoning flags based on known model capabilities; `patch.json` adds compat overrides.
+`patch.json` is reserved only for a verified provider regression and is currently empty.
 
 ### Patch Overrides
 
-The `patch.json` file contains overrides applied on top of `models.json` data:
-
-- Correcting API-derived values (e.g., DeepSeek `maxTokens` from 8000 to 384000)
-- Adding compat settings that the API doesn't provide
-- Setting `thinkingFormat: "deepseek"` + `thinkingLevelMap` for DeepSeek V4 models
-- Overriding pricing when official rates change
+`patch.json` is applied on top of `models.json` only for verified endpoint corrections. It is currently empty because every live field comes from Charm's canonical provider catalog.
 
 ## Updating Models
 
@@ -199,10 +184,11 @@ node scripts/update-models.js
 
 This will:
 1. Fetch models from `https://hyper.charm.land/v1/models`
-2. Preserve curated data (reasoning, vision, DeepSeek compat) from existing `models.json`
-3. Apply overrides from `patch.json`
+2. Regenerate `models.json` as pure metadata from Charm's typed `/v1/provider` catalog
+3. Apply overrides from `patch.json` only when building the README
 4. Remove custom models now available upstream from `custom-models.json`
-5. Update `models.json` and the README model table
+5. Reconcile delisted models through the 14-day `deprecated-models.json` grace layer
+6. Update `models.json` and the README model table
 
 A GitHub Actions workflow runs this daily and creates a PR if models have changed.
 

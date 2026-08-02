@@ -1,20 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Update HyperCharm models from API
+ * Update HyperCharm models from Charm's official typed provider catalog
  *
- * Fetches models from https://hyper.charm.land/v1/models and updates:
- * - models.json: Model definitions with curated reasoning/vision flags + API pricing
- * - README.md: Model table with patch.json overrides applied
+ * Fetches models from https://hyper.charm.land/v1/provider and updates:
+ * - models.json: canonical API-owned metadata used by @charmland/pi-hyper-provider
+ * - README.md: model table with patch.json overrides applied
  *
- * The HyperCharm API provides: id, display_name, supports_reasoning,
- * supports_reasoning_effort, supports_attachments, context_window,
- * max_output_tokens, and cost.usd pricing.
- *
- * Note: supports_reasoning is unreliable for some models (reports true for
- * Llama 3.3 70B which doesn't support extended thinking). models.json
- * curates reasoning flags based on known model capabilities; patch.json
- * adds compat flags and corrections.
+ * The endpoint provides canonical names, $/M pricing, context/output limits,
+ * can_reason, optional reasoning levels, and attachment support. models.json is
+ * pure API data. patch.json is reserved for verified endpoint regressions and
+ * currently contains no overrides.
  *
  * Merge order for README: models.json → apply patch.json → merge custom-models.json
  */
@@ -25,7 +21,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const MODELS_API_URL = 'https://hyper.charm.land/v1/models';
+const MODELS_API_URL = 'https://hyper.charm.land/v1/provider';
 const MODELS_JSON_PATH = path.join(__dirname, '..', 'models.json');
 const PATCH_JSON_PATH = path.join(__dirname, '..', 'patch.json');
 const CUSTOM_MODELS_JSON_PATH = path.join(__dirname, '..', 'custom-models.json');
@@ -76,6 +72,9 @@ function applyPatch(model, patch) {
   if (!result.reasoning && result.compat?.thinkingFormat) {
     delete result.compat.thinkingFormat;
   }
+  if (!result.reasoning && result.thinkingLevelMap) {
+    delete result.thinkingLevelMap;
+  }
   if (result.compat && Object.keys(result.compat).length === 0) {
     delete result.compat;
   }
@@ -102,91 +101,68 @@ function buildModels(baseModels, customModels, patchData) {
 
 // ─── Model transformation ─────────────────────────────────────────────────────
 
-// Known non-reasoning models (API incorrectly reports supports_reasoning: true)
-const NON_REASONING_IDS = new Set([
-  'llama-3.3-70b-instruct',
-  'llama-4-maverick-17b-128e-instruct-fp8',
-]);
+const PI_THINKING_LEVELS = ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'];
 
-// Known vision models
-const VISION_IDS = new Set([
-  'kimi-k2.5',
-  'kimi-k2.6',
-  'glm-5.1',
-  'gemma-4-26b-a4b-it',
-  'qwen3.6-flash',
-  'qwen3.6-max',
-  'qwen3.6-plus',
-  'qwen3.7-max',
-]);
+// Charm's official extension treats a reasoning-capable model with no levels as
+// a boolean on/off model: Pi's max level selects the single on state.
+const ON_OFF_THINKING_LEVEL_MAP = {
+  off: 'off',
+  minimal: null,
+  low: null,
+  medium: null,
+  high: null,
+  xhigh: null,
+  max: 'max',
+};
 
-function transformModel(apiModel, existingModelsMap) {
-  const modelId = apiModel.id;
-
-  // Preserve existing curated data
-  if (existingModelsMap[modelId]) {
-    const existing = { ...existingModelsMap[modelId] };
-
-    // Update fields from API that may change
-    const cost = apiModel.cost?.usd || {};
-    const inputCost = convertPricing(cost['1m_in']);
-    const outputCost = convertPricing(cost['1m_out']);
-    const cacheReadCost = convertPricing(cost['1m_in_cache']);
-    const cacheWriteCost = convertPricing(cost['1m_out_cache']);
-
-    if (inputCost > 0) existing.cost.input = inputCost;
-    if (outputCost > 0) existing.cost.output = outputCost;
-    if (cacheReadCost > 0) existing.cost.cacheRead = cacheReadCost;
-    if (cacheWriteCost > 0) existing.cost.cacheWrite = cacheWriteCost;
-    if (apiModel.context_window) existing.contextWindow = apiModel.context_window;
-    // Don't override maxTokens from API for DeepSeek — it reports 8000 but the
-    // actual max is 384K (set in models.json / patch.json)
-    if (apiModel.max_output_tokens && !/^deepseek-v/.test(modelId)) {
-      existing.maxTokens = apiModel.max_output_tokens;
-    }
-
-    return existing;
+function buildThinkingLevelMap(levels) {
+  if (levels.length === 0) return undefined;
+  const available = new Set(levels);
+  const result = {
+    // The provider enum uses "none" for the off state on newer deployments;
+    // the official extension looked only for the older "off" spelling.
+    off: available.has('off') ? 'off' : available.has('none') ? 'none' : null,
+  };
+  for (const level of PI_THINKING_LEVELS) {
+    result[level] = available.has(level) ? level : null;
   }
+  return result;
+}
 
-  // New model — build from API data + curated defaults
-  const cost = apiModel.cost?.usd || {};
-  const isReasoning = apiModel.supports_reasoning === true && !NON_REASONING_IDS.has(modelId);
-  const isVision = VISION_IDS.has(modelId);
-  const isDeepSeek = /^deepseek-v/.test(modelId);
+function transformModel(apiModel) {
+  const reasoningLevels = Array.isArray(apiModel.reasoning_levels)
+    ? apiModel.reasoning_levels.filter(level => typeof level === 'string')
+    : [];
+  const supportsReasoningEffort = reasoningLevels.length > 0;
+  const thinkingLevelMap = supportsReasoningEffort
+    ? buildThinkingLevelMap(reasoningLevels)
+    : apiModel.can_reason === true
+      ? ON_OFF_THINKING_LEVEL_MAP
+      : undefined;
 
-  const model = {
-    id: modelId,
-    name: apiModel.display_name || modelId,
-    reasoning: isReasoning,
-    input: isVision ? ['text', 'image'] : ['text'],
+  return {
+    id: apiModel.id,
+    name: apiModel.name,
+    reasoning: apiModel.can_reason === true,
+    ...(thinkingLevelMap ? { thinkingLevelMap } : {}),
+    input: apiModel.supports_attachments === true ? ['text', 'image'] : ['text'],
     cost: {
-      input: convertPricing(cost['1m_in']),
-      output: convertPricing(cost['1m_out']),
-      cacheRead: convertPricing(cost['1m_in_cache']),
-      cacheWrite: convertPricing(cost['1m_out_cache']),
+      input: typeof apiModel.cost_per_1m_in === 'number' ? apiModel.cost_per_1m_in : 0,
+      output: typeof apiModel.cost_per_1m_out === 'number' ? apiModel.cost_per_1m_out : 0,
+      cacheRead: typeof apiModel.cost_per_1m_in_cached === 'number' ? apiModel.cost_per_1m_in_cached : 0,
+      // Hyper exposes discounted cached-output pricing, not cache-write pricing;
+      // pi's cost.cacheWrite field remains unused. This matches Charm's official extension.
+      cacheWrite: 0,
     },
     contextWindow: apiModel.context_window || 0,
-    maxTokens: apiModel.max_output_tokens || 0,
-  };
-
-  // DeepSeek models: override maxTokens (API reports 8000, actual is 384K)
-  // and add thinkingLevelMap + deepseek compat
-  if (isDeepSeek && isReasoning) {
-    model.maxTokens = 384000;
-    model.thinkingLevelMap = {
-      minimal: null, low: null, medium: null, high: 'high', max: 'max',
-    };
-    model.compat = {
+    maxTokens: apiModel.default_max_tokens || apiModel.context_window || 0,
+    compat: {
+      supportsStore: false,
+      supportsReasoningEffort,
       thinkingFormat: 'deepseek',
       maxTokensField: 'max_tokens',
-      supportsDeveloperRole: true,
-      supportsStore: false,
-      supportsReasoningEffort: true,
-      requiresReasoningContentOnAssistantMessages: true,
-    };
-  }
-
-  return model;
+    },
+  };
 }
 
 // ─── README generation ────────────────────────────────────────────────────────
@@ -317,7 +293,9 @@ async function main() {
     }
 
     const apiResponse = await response.json();
-    const apiModels = apiResponse.data || apiResponse;
+    const apiModels = Array.isArray(apiResponse)
+      ? apiResponse
+      : (apiResponse.models || apiResponse.data || []);
 
     if (!Array.isArray(apiModels)) {
       throw new Error('API response does not contain an array of models');
@@ -338,16 +316,12 @@ async function main() {
     }
 
     // Transform models from API, preserving existing curated data
-    let apiTransformed = apiModels.map(m => transformModel(m, existingModelsMap));
+    let apiTransformed = apiModels.map(m => transformModel(m));
     apiTransformed.sort((a, b) => a.name.localeCompare(b.name));
 
-    // Log new models (not in patch.json)
+    // Load patch overrides for README rendering. Canonical metadata already
+    // comes from /v1/provider, so new models do not require a patch entry.
     const patch = loadJson(PATCH_JSON_PATH);
-    for (const m of apiTransformed) {
-      if (!patch[m.id]) {
-        console.log(`  🆕 New model: ${m.id} (${m.name}) — add to patch.json for compat overrides`);
-      }
-    }
 
     // Update models.json — curated API data
     // Move delisted models to deprecated-models.json BEFORE models.json is overwritten
