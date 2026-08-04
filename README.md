@@ -15,7 +15,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 
 ## Features
 
-- **24+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **25+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **Official Catalog Sync** from Charm's typed `/v1/provider` endpoint, matching `@charmland/pi-hyper-provider`
@@ -29,20 +29,20 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | DeepSeek V4 Flash | Text | 1.0M | 384K | $0.20 | $0.40 |
 | DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.15 | $0.30 |
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
-| Gemma 4 26B A4B | Text | 256K | 26K | $0.13 | $0.43 |
+| Gemma 4 26B A4B | Text | 256K | 26K | $0.13 | $0.42 |
 | GLM-5 | Text | 203K | 20K | $0.85 | $2.62 |
 | GLM-5.1 | Text | 203K | 131K | $1.52 | $4.79 |
 | GLM-5.2 | Text | 1.0M | 128K | $1.40 | $4.40 |
 | gpt-oss-120b | Text | 131K | 13K | $0.19 | $0.70 |
-| Kimi K2.5 | Text | 262K | 26K | $0.56 | $2.82 |
+| Kimi K2.5 | Text | 262K | 26K | $0.54 | $2.85 |
 | Kimi K2.6 | Text + Image | 262K | 262K | $0.95 | $4.00 |
 | Kimi K2.7 Code | Text + Image | 256K | 16K | $0.95 | $4.00 |
 | Kimi K3 | Text + Image | 1.0M | 131K | $3.27 | $16.33 |
 | Llama 3.3 70B Instruct | Text | 128K | 13K | $0.51 | $1.04 |
 | Llama 4 Maverick 17B 128E Instruct FP8 | Text | 430K | 43K | $0.28 | $0.93 |
-| MiniMax M2.7 | Text | 205K | 20K | $0.44 | $1.72 |
+| MiniMax M2.7 | Text | 262K | 7K | $0.42 | $1.62 |
 | MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
-| Qwen3 Coder 480B A35B Instruct INT4 Mixed AR | Text | 106K | 11K | $0.57 | $2.13 |
+| Qwen3 Coder 480B A35B Instruct INT4 Mixed AR | Text | 106K | 11K | $0.57 | $2.15 |
 | Qwen3 Next 80B A3B Instruct | Text | 262K | 26K | $0.12 | $1.14 |
 | Qwen3.6-Flash | Text + Image | 1.0M | 64K | $1.00 | $4.00 |
 | Qwen3.6-Max | Text | 256K | 64K | $2.00 | $12.00 |
@@ -50,6 +50,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
 | Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
 | Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
+| Qwen3.8-Max | Text | 1.0M | 66K | $2.00 | $6.00 |
 *Costs are per million tokens. Prices subject to change — check [hyper.charm.land](https://hyper.charm.land) for current pricing.*
 
 ## Installation
