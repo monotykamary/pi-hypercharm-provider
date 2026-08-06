@@ -35,7 +35,7 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
+      "off": null,
       "minimal": null,
       "low": null,
       "medium": null,
@@ -47,12 +47,12 @@
       "text"
     ],
     "cost": {
-      "input": 0.152432,
-      "output": 0.304864,
+      "input": 0.2,
+      "output": 0.4,
       "cacheRead": 0,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -109,9 +109,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.126,
-      "output": 0.42,
-      "cacheRead": 0.063,
+      "input": 0.124,
+      "output": 0.4,
+      "cacheRead": 0.062,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -140,9 +140,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.85,
-      "output": 2.622,
-      "cacheRead": 0.425,
+      "input": 0.82,
+      "output": 2.548,
+      "cacheRead": 0.41,
       "cacheWrite": 0
     },
     "contextWindow": 202752,
@@ -233,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.188,
-      "output": 0.7,
-      "cacheRead": 0.094,
+      "input": 0.166,
+      "output": 0.632,
+      "cacheRead": 0.083,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -264,9 +264,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.54,
-      "output": 2.85,
-      "cacheRead": 0.27,
+      "input": 0.558,
+      "output": 2.94,
+      "cacheRead": 0.279,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -382,9 +382,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.5126,
-      "output": 1.0446,
-      "cacheRead": 0.2563,
+      "input": 0.6066,
+      "output": 1.0386,
+      "cacheRead": 0.3033,
       "cacheWrite": 0
     },
     "contextWindow": 128000,
@@ -435,9 +435,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.42,
-      "output": 1.62,
-      "cacheRead": 0.21,
+      "input": 0.436,
+      "output": 1.72,
+      "cacheRead": 0.218,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
@@ -489,9 +489,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.575,
-      "output": 2.145,
-      "cacheRead": 0.2875,
+      "input": 0.569,
+      "output": 2.135,
+      "cacheRead": 0.2845,
       "cacheWrite": 0
     },
     "contextWindow": 106000,
