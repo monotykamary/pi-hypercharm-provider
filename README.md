@@ -29,18 +29,18 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | DeepSeek V4 Flash | Text | 1.0M | 384K | $0.20 | $0.40 |
 | DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.20 | $0.40 |
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
-| Gemma 4 26B A4B | Text | 256K | 26K | $0.12 | $0.40 |
-| GLM-5 | Text | 203K | 20K | $0.82 | $2.55 |
+| Gemma 4 26B A4B | Text | 256K | 26K | $0.12 | $0.42 |
+| GLM-5 | Text | 203K | 20K | $0.85 | $2.74 |
 | GLM-5.1 | Text | 203K | 131K | $1.52 | $4.79 |
 | GLM-5.2 | Text | 1.0M | 128K | $1.40 | $4.40 |
-| gpt-oss-120b | Text | 131K | 13K | $0.17 | $0.63 |
-| Kimi K2.5 | Text | 262K | 26K | $0.56 | $2.94 |
+| gpt-oss-120b | Text | 131K | 13K | $0.19 | $0.73 |
+| Kimi K2.5 | Text | 262K | 26K | $0.55 | $2.89 |
 | Kimi K2.6 | Text + Image | 262K | 262K | $0.95 | $4.00 |
 | Kimi K2.7 Code | Text + Image | 256K | 16K | $0.95 | $4.00 |
 | Kimi K3 | Text + Image | 1.0M | 131K | $3.27 | $16.33 |
 | Llama 3.3 70B Instruct | Text | 128K | 13K | $0.61 | $1.04 |
-| Llama 4 Maverick 17B 128E Instruct FP8 | Text | 430K | 43K | $0.28 | $0.93 |
-| MiniMax M2.7 | Text | 262K | 7K | $0.44 | $1.72 |
+| Llama 4 Maverick 17B 128E Instruct FP8 | Text | 430K | 43K | $0.27 | $0.90 |
+| MiniMax M2.7 | Text | 262K | 7K | $0.41 | $1.52 |
 | MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
 | Qwen3 Coder 480B A35B Instruct INT4 Mixed AR | Text | 106K | 11K | $0.57 | $2.13 |
 | Qwen3 Next 80B A3B Instruct | Text | 262K | 26K | $0.12 | $1.14 |
@@ -50,7 +50,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
 | Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
 | Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
-| Qwen3.8-Max | Text | 1.0M | 66K | $2.00 | $6.00 |
+| Qwen3.8-Max | Text + Image | 1.0M | 66K | $2.00 | $6.00 |
 *Costs are per million tokens. Prices subject to change — check [hyper.charm.land](https://hyper.charm.land) for current pricing.*
 
 ## Installation
