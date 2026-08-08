@@ -125,6 +125,51 @@ Supported levels are model-specific and come from Charm's `/v1/provider` catalog
 
 DeepSeek V4 models use the `deepseek` thinking format — the same native format as the [pi-deepseek-provider](https://github.com/monotykamary/pi-deepseek-provider). This sends `thinking: {type: "enabled/disabled"}` plus `reasoning_effort` mapped via `thinkingLevelMap` (`high` → `"high"`, `max` → `"max"`). Replayed assistant messages include empty `reasoning_content` as required by DeepSeek's API.
 
+## Footer Status
+
+A Neuralwatt-style status line sits below the editor. It appears after the
+session's first HyperCharm turn completes (never before — no half-empty line
+on fresh sessions or other providers), refreshes its balance when the agent
+run fully settles, and makes no status-related API calls in sessions that
+never use HyperCharm:
+
+```
+⚡ 1.24 hc · 7 req                       Xu's Team ◆ 249 hc · 996/1k/h · 29d
+└─ session spend+requests ─┘           └─ team · balance · rate limits ──┘
+```
+
+The left side tracks what the current session has sent/spent, read from
+Hyper's `usage.cost.hypercredits` extension on each response (no polling).
+The right side shows the team name (`/v1/teams` — works for API-key auth),
+the Hypercredit balance (`/v1/credits`), the per-hour and per-day request
+rate limits captured from response headers, and days until the OAuth device
+session expires when signed in with OAuth. The right side compresses
+progressively as the terminal narrows, and turns to a warning color at/below
+the `lowBalanceHc` threshold.
+
+### Configuration
+
+Edit `~/.pi/agent/extensions/hypercharm.json` or run `/hypercharm-status`:
+
+| Setting | Values | Default |
+|---------|--------|---------|
+| `session` | `widget` \| `statusbar` \| `off` | `widget` |
+| `account` | `widget` \| `statusbar` \| `off` | `widget` |
+| `hideOnOtherProvider` | `true` \| `false` | `true` |
+| `lowBalanceHc` | number \| `null` | `25` |
+
+Non-interactive toggles:
+
+```
+/hypercharm-status session widget|statusbar|off
+/hypercharm-status account widget|statusbar|off
+/hypercharm-status hide true|false
+/hypercharm-status lowBalance 50|off
+/hypercharm-status refresh
+/hypercharm-status reset
+```
+
+
 ## Authentication
 
 The HyperCharm API key can be configured in multiple ways (resolved in this order):

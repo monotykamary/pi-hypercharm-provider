@@ -8,7 +8,8 @@
   "scripts": {
     "clean": "echo 'nothing to clean'",
     "build": "echo 'nothing to build'",
-    "check": "echo 'nothing to check'",
+    "check": "tsc --noEmit && node tests/status.smoke.ts",
+    "smoke": "node tests/status.smoke.ts",
     "update-models": "node scripts/update-models.js"
   },
   "keywords": [
@@ -28,6 +29,12 @@
     "gemma",
     "gpt-oss"
   ],
+  "devDependencies": {
+    "@earendil-works/pi-ai": "0.84.1",
+    "@earendil-works/pi-coding-agent": "0.84.1",
+    "@types/node": "^24.10.1",
+    "typescript": "6.0.3"
+  },
   "author": "",
   "license": "MIT",
   "pi": {
