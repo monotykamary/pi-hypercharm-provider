@@ -146,7 +146,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 202800,
-    "maxTokens": 131072,
+    "maxTokens": 3276,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
@@ -177,7 +177,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 1000000,
-    "maxTokens": 128000,
+    "maxTokens": 32768,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
@@ -271,7 +271,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 262000,
-    "maxTokens": 262000,
+    "maxTokens": 26214,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
