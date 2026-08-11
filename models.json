@@ -37,7 +37,7 @@
     "thinkingLevelMap": {
       "off": "none",
       "minimal": null,
-      "low": null,
+      "low": "low",
       "medium": null,
       "high": "high",
       "xhigh": "xhigh",
@@ -109,9 +109,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.124,
-      "output": 0.42,
-      "cacheRead": 0.062,
+      "input": 0.116,
+      "output": 0.408,
+      "cacheRead": 0.058,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -202,9 +202,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.178,
-      "output": 0.71,
-      "cacheRead": 0.089,
+      "input": 0.188,
+      "output": 0.73,
+      "cacheRead": 0.094,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -233,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.55,
-      "output": 2.89,
-      "cacheRead": 0.275,
+      "input": 0.558,
+      "output": 2.94,
+      "cacheRead": 0.279,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -351,8 +351,8 @@
       "text"
     ],
     "cost": {
-      "input": 0.6066,
-      "output": 1.0386,
+      "input": 0.598,
+      "output": 0.738,
       "cacheRead": 0.3033,
       "cacheWrite": 0
     },
@@ -404,9 +404,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.436,
-      "output": 1.72,
-      "cacheRead": 0.218,
+      "input": 0.48,
+      "output": 1.8,
+      "cacheRead": 0.24,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
@@ -458,8 +458,8 @@
       "text"
     ],
     "cost": {
-      "input": 0.569,
-      "output": 2.135,
+      "input": 0.445,
+      "output": 2.145,
       "cacheRead": 0.2845,
       "cacheWrite": 0
     },
