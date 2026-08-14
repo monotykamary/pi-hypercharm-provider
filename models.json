@@ -35,7 +35,7 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
+      "off": null,
       "minimal": null,
       "low": "low",
       "medium": null,
@@ -47,12 +47,12 @@
       "text"
     ],
     "cost": {
-      "input": 0.152432,
-      "output": 0.304864,
+      "input": 0.2,
+      "output": 0.4,
       "cacheRead": 0,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -109,9 +109,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.116,
-      "output": 0.408,
-      "cacheRead": 0.058,
+      "input": 0.126,
+      "output": 0.42,
+      "cacheRead": 0.063,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -203,7 +203,7 @@
     ],
     "cost": {
       "input": 0.188,
-      "output": 0.73,
+      "output": 0.7,
       "cacheRead": 0.094,
       "cacheWrite": 0
     },
@@ -233,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.558,
-      "output": 2.94,
-      "cacheRead": 0.279,
+      "input": 0.532,
+      "output": 2.8,
+      "cacheRead": 0.266,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -404,9 +404,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.436,
-      "output": 1.66,
-      "cacheRead": 0.218,
+      "input": 0.47,
+      "output": 1.76,
+      "cacheRead": 0.235,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
