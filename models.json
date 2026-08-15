@@ -35,7 +35,7 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": null,
+      "off": "none",
       "minimal": null,
       "low": "low",
       "medium": null,
@@ -47,12 +47,12 @@
       "text"
     ],
     "cost": {
-      "input": 0.2,
-      "output": 0.4,
+      "input": 0.152432,
+      "output": 0.304864,
       "cacheRead": 0,
       "cacheWrite": 0
     },
-    "contextWindow": 1000000,
+    "contextWindow": 1048576,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -93,6 +93,37 @@
     }
   },
   {
+    "id": "deepseek-v4-pro-0813",
+    "name": "DeepSeek V4 Pro 0813",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": "none",
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "xhigh",
+      "max": null
+    },
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 1.437216,
+      "output": 4.311648,
+      "cacheRead": 0,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1048576,
+    "maxTokens": 262144,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
     "id": "gemma-4-26b-a4b-it",
     "name": "Gemma 4 26B A4B",
     "reasoning": true,
@@ -109,9 +140,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.126,
+      "input": 0.124,
       "output": 0.42,
-      "cacheRead": 0.063,
+      "cacheRead": 0.062,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -202,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.188,
-      "output": 0.7,
-      "cacheRead": 0.094,
+      "input": 0.16332,
+      "output": 0.65328,
+      "cacheRead": 0,
       "cacheWrite": 0
     },
     "contextWindow": 131072,
@@ -233,9 +264,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.532,
-      "output": 2.8,
-      "cacheRead": 0.266,
+      "input": 0.558,
+      "output": 2.94,
+      "cacheRead": 0.279,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -351,9 +382,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.598,
-      "output": 0.738,
-      "cacheRead": 0.299,
+      "input": 0.608,
+      "output": 0.838,
+      "cacheRead": 0.304,
       "cacheWrite": 0
     },
     "contextWindow": 128000,
@@ -404,9 +435,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.47,
-      "output": 1.76,
-      "cacheRead": 0.235,
+      "input": 0.426,
+      "output": 1.62,
+      "cacheRead": 0.213,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
