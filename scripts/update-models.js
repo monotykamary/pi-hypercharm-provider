@@ -255,10 +255,10 @@ function transformModel(apiModel) {
     cost: {
       input: typeof apiModel.cost_per_1m_in === 'number' ? apiModel.cost_per_1m_in : 0,
       output: typeof apiModel.cost_per_1m_out === 'number' ? apiModel.cost_per_1m_out : 0,
-      cacheRead: typeof apiModel.cost_per_1m_in_cached === 'number' ? apiModel.cost_per_1m_in_cached : 0,
-      // Hyper exposes discounted cached-output pricing, not cache-write pricing;
-      // pi's cost.cacheWrite field remains unused. This matches Charm's official extension.
-      cacheWrite: 0,
+      // Matches Charm's official extension: cacheRead is the discounted cached-output
+      // price, cacheWrite the cached-input price.
+      cacheRead: typeof apiModel.cost_per_1m_out_cached === 'number' ? apiModel.cost_per_1m_out_cached : 0,
+      cacheWrite: typeof apiModel.cost_per_1m_in_cached === 'number' ? apiModel.cost_per_1m_in_cached : 0,
     },
     contextWindow: apiModel.context_window || 0,
     maxTokens: apiModel.default_max_tokens || apiModel.context_window || 0,

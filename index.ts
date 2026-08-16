@@ -280,8 +280,8 @@ function transformApiModel(apiModel: any): JsonModel | null {
 		cost: {
 			input: apiModel.cost_per_1m_in || 0,
 			output: apiModel.cost_per_1m_out || 0,
-			cacheRead: apiModel.cost_per_1m_in_cached || 0,
-			cacheWrite: 0,
+			cacheRead: apiModel.cost_per_1m_out_cached || 0,
+			cacheWrite: apiModel.cost_per_1m_in_cached || 0,
 		},
 		contextWindow: apiModel.context_window || 0,
 		maxTokens: apiModel.default_max_tokens || apiModel.context_window || 0,
