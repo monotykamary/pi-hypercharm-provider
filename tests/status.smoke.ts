@@ -9,6 +9,7 @@ import {
 	EMPTY_ACCOUNT,
 	StatusLineWidget,
 	accountHasData,
+	applyOptimisticSpend,
 	buildAccountTiers,
 	buildSessionLine,
 	coerceStatusConfig,
@@ -64,6 +65,20 @@ assert.deepEqual(buildAccountTiers(acc({ teamName: "ACME" }), false), ["ACME"]);
 const balOnly = buildAccountTiers(acc({ balance: 12 }), true);
 assert.equal(balOnly[0], "⚠ ◆ 12 hc");
 assert.ok(balOnly.includes("12 hc"));
+
+// optimistic spend deduction
+{
+	const opt = acc({ balance: 249 });
+	applyOptimisticSpend(opt, 0.5);
+	assert.equal(opt.balance, 248.5);
+	applyOptimisticSpend(opt, 0); // zero spend is a no-op
+	assert.equal(opt.balance, 248.5);
+	applyOptimisticSpend(opt, 300); // clamps at 0, never negative
+	assert.equal(opt.balance, 0);
+	const unknown = acc({ balance: null });
+	applyOptimisticSpend(unknown, 1); // unknown balance stays unknown
+	assert.equal(unknown.balance, null);
+}
 
 // ── width math ──
 assert.equal(termVisWidth("abc"), 3);

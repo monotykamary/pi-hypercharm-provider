@@ -41,6 +41,10 @@
  *   again on pi's agent_settled event (fires only once no automatic retry,
  *   compaction, or queued continuation can follow) — and nowhere else, so
  *   sessions without HyperCharm turns make zero status-related API calls.
+ *   Between polls the balance moves optimistically: each turn's
+ *   usage.cost.hypercredits is deducted from the last /v1/credits value at
+ *   turn_end so the account line tracks spend live; the agent_settled poll
+ *   reconciles any drift.
  *
  *   Unit note (observed): 20 hypercredits = $1. usage.cost.hypercredits is in
  *   the same display unit /v1/credits reports; usage.cost.usd ÷ 20 matches.
@@ -92,6 +96,7 @@ import customModelsData from "./custom-models.json" with { type: "json" };
 import patchData from "./patch.json" with { type: "json" };
 import deprecatedData from "./deprecated-models.json" with { type: "json" };
 import {
+	applyOptimisticSpend,
 	buildAccountTiers,
 	buildSessionLine,
 	coerceStatusConfig,
@@ -772,6 +777,13 @@ function commitPending(ctx: ExtensionContext): void {
 	if (!pendingSawUsage && pendingRequests === 0) return;
 	sessionStats.requests += pendingRequests;
 	sessionStats.spendHc += pendingSpendHc;
+
+	// Optimistic balance: deduct this turn's observed spend so the account
+	// line ticks down per turn with zero extra API calls. Every credits poll
+	// overwrites account.balance (never adjusts), so this cannot
+	// double-count; the agent_settled poll reconciles any drift.
+	applyOptimisticSpend(account, pendingSpendHc);
+
 	pendingRequests = 0;
 	pendingSpendHc = 0;
 	pendingSawUsage = false;

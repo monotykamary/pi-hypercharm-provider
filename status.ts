@@ -96,6 +96,19 @@ export interface SessionStats {
 
 export const EMPTY_SESSION_STATS: SessionStats = { requests: 0, spendHc: 0 };
 
+/**
+ * Optimistically deduct observed turn spend from the last polled balance.
+ * Safe against double-counting only because callers overwrite (never adjust)
+ * `balance` on every credits poll — the agent_settled poll reconciles drift.
+ * Unknown balances stay unknown; estimates clamp at 0 (real exhaustion is
+ * still signaled by the 402 path, not by an estimated zero).
+ */
+export function applyOptimisticSpend(acc: AccountState, spendHc: number): void {
+	if (spendHc > 0 && acc.balance !== null) {
+		acc.balance = Math.max(0, acc.balance - spendHc);
+	}
+}
+
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
 function trimZeros(text: string): string {
