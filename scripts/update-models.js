@@ -274,10 +274,9 @@ function transformModel(apiModel) {
 // ─── README generation ────────────────────────────────────────────────────────
 
 function formatCost(cost) {
-  if (cost === 0) return 'Free';
-  if (cost === null || cost === undefined) return '-';
-  if (cost < 0.01) return `$${cost.toFixed(4)}`;
-  return `$${cost.toFixed(2)}`;
+  if (cost === 0) return '—';
+  if (cost === null || cost === undefined) return '—';
+  return '$' + cost.toFixed(2);
 }
 
 function formatNumber(num) {
@@ -380,6 +379,31 @@ function updateDeprecatedModels(modelsJsonPath, newModels) {
   }
 }
 
+/**
+ * Grace-period deprecated models (deprecatedAt within TTL) with metadata stripped.
+ * Keeps the README table serving models that are delisted but still within their
+ * 14-day grace window.
+ */
+function withDeprecatedForReadme(models) {
+  const deprecatedPath = path.join(process.cwd(), 'deprecated-models.json');
+  let deprecated = {};
+  try {
+    const parsed = JSON.parse(fs.readFileSync(deprecatedPath, 'utf8'));
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) deprecated = parsed;
+  } catch { /* no graveyard yet */ }
+  const now = Date.now();
+  const seen = new Set(models.map(m => m.id));
+  const extras = [];
+  for (const entry of Object.values(deprecated)) {
+    if (!entry || !entry.id || seen.has(entry.id)) continue;
+    const removedAt = Date.parse(entry.deprecatedAt || '');
+    if (Number.isNaN(removedAt) || now - removedAt > DEPRECATED_MODEL_TTL_MS) continue;
+    const m = { ...entry };
+    delete m.deprecatedAt;
+    extras.push(m);
+  }
+  return extras.length > 0 ? [...models, ...extras] : models;
+}
 async function main() {
   const apiKey = resolveApiKey();
   if (!apiKey) {
@@ -456,7 +480,7 @@ async function main() {
     }
 
     // Build merged models with patches for README
-    const readmeModels = buildModels(apiTransformed, customModels, patch);
+    const readmeModels = buildModels(withDeprecatedForReadme(apiTransformed), customModels, patch);
     readmeModels.sort((a, b) => a.name.localeCompare(b.name));
 
     // Update README
