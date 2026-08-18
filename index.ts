@@ -624,6 +624,9 @@ const CREDITS_MIN_INTERVAL_MS = 15_000;
 const ACCOUNT_FETCH_TIMEOUT_MS = 8_000;
 
 let statusAbort: AbortController | null = null;
+// Bumped on every session_start; async continuations compare against this to
+// drop work belonging to a replaced session (its ctx is stale and throws).
+let statusEpoch = 0;
 let lastCreditsFetchAt = 0;
 let creditsInFlight: Promise<void> | null = null;
 let metaFetched = false;
@@ -707,7 +710,30 @@ function currentProviderId(ctx: ExtensionContext): string | undefined {
 	}
 }
 
+function isStaleCtxError(err: unknown): boolean {
+	return err instanceof Error && err.message.includes("This extension ctx is stale");
+}
+
+// Render entry point: swallows the stale-ctx throw so a refresh racing a
+// session replacement (newSession/fork/switchSession/reload) can't crash pi.
 function updateStatus(ctx: ExtensionContext): void {
+	try {
+		renderStatus(ctx);
+	} catch (err) {
+		if (!isStaleCtxError(err)) throw err;
+	}
+}
+
+// Re-render once an async refresh lands, unless the session was replaced
+// meanwhile (epoch bump) — its ctx is stale and the render is obsolete anyway.
+function updateStatusAfter(promise: Promise<void>, ctx: ExtensionContext): void {
+	const epoch = statusEpoch;
+	void promise.then(() => {
+		if (epoch === statusEpoch) updateStatus(ctx);
+	});
+}
+
+function renderStatus(ctx: ExtensionContext): void {
 	const provider = currentProviderId(ctx);
 	const hiddenByOtherProvider =
 		statusConfig.hideOnOtherProvider && provider !== undefined && provider !== PROVIDER_ID;
@@ -791,7 +817,7 @@ function commitPending(ctx: ExtensionContext): void {
 	if (pendingSawOutOfCredits) {
 		pendingSawOutOfCredits = false;
 		// Re-fetch now so the balance reflects exhaustion immediately
-		void refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true).then(() => updateStatus(ctx));
+		updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true), ctx);
 		if (!outOfCreditsNotified && ctx.hasUI) {
 			outOfCreditsNotified = true;
 			ctx.ui.notify("HyperCharm is out of Hypercredits — recharge at hyper.charm.land", "error");
@@ -854,7 +880,7 @@ async function handleStatusCommand(args: string, ctx: ExtensionContext): Promise
 		writeStatusConfig();
 		if (value !== "off" && key === "account") {
 			// Turning account on: make sure we have data to show
-			void refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true).then(() => updateStatus(ctx));
+			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true), ctx);
 			void refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
 		}
 		updateStatus(ctx);
@@ -929,7 +955,7 @@ async function configureStatusInteractive(ctx: ExtensionContext): Promise<void> 
 			statusConfig.account = nextMode(statusConfig.account);
 			writeStatusConfig();
 			if (statusConfig.account !== "off") {
-				void refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true).then(() => updateStatus(ctx));
+				updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true), ctx);
 				void refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
 			}
 			continue;
@@ -1003,11 +1029,13 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.on("session_start", async (_event, ctx) => {
+		const epoch = ++statusEpoch;
 		revalidateAbort?.abort();
 		revalidateAbort = new AbortController();
 		const signal = revalidateAbort.signal;
 		statusAbort?.abort();
 		statusAbort = new AbortController();
+		const statusSignal = statusAbort.signal;
 
 		loadStatusConfig();
 		resetStatusState();
@@ -1017,15 +1045,18 @@ export default function (pi: ExtensionAPI) {
 		pi.registerProvider(PROVIDER_ID, makeProviderConfig());
 
 		resolveApiKey(ctx.modelRegistry).then(() => {
+			// A session replacement while the key resolved invalidated the
+			// captured ctx (fast-resume, /new, /fork); nothing below may touch it.
+			if (epoch !== statusEpoch) return;
 			// Prefetch credits/team metadata only when a HyperCharm model is active
 			// (pi-neuralwatt also prefetches so the first turn ends with data, but
 			// gating here avoids API calls in sessions that never use the provider).
 			if (currentProviderId(ctx) === PROVIDER_ID) {
-				void refreshCredits(cachedApiKey, statusAbort!.signal, true).then(() => updateStatus(ctx));
-				void refreshAccountMeta(cachedApiKey, statusAbort!.signal).then(() => updateStatus(ctx));
+				updateStatusAfter(refreshCredits(cachedApiKey, statusSignal, true), ctx);
+				updateStatusAfter(refreshAccountMeta(cachedApiKey, statusSignal), ctx);
 			}
 			revalidateModels(cachedApiKey, embeddedModels, signal).then((freshBase) => {
-				if (freshBase && !signal.aborted) {
+				if (freshBase && epoch === statusEpoch && !signal.aborted) {
 					currentModels = buildModels(freshBase, customModels, patches);
 					pi.registerProvider(PROVIDER_ID, makeProviderConfig());
 				}
@@ -1037,7 +1068,7 @@ export default function (pi: ExtensionAPI) {
 		updateStatus(ctx);
 		const model: any = (event as any).model;
 		if (model?.provider === PROVIDER_ID && cachedApiKey) {
-			void refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false).then(() => updateStatus(ctx));
+			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false), ctx);
 			void refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
 		}
 	});
