@@ -35,24 +35,24 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
-      "minimal": "minimal",
+      "off": null,
+      "minimal": null,
       "low": "low",
-      "medium": "medium",
+      "medium": null,
       "high": "high",
       "xhigh": "xhigh",
-      "max": "max"
+      "max": null
     },
     "input": [
       "text"
     ],
     "cost": {
-      "input": 0.13,
-      "output": 0.26,
-      "cacheRead": 0.028,
+      "input": 0.44,
+      "output": 1.32,
+      "cacheRead": 0.044,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -140,10 +140,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.122,
+      "input": 0.12,
       "output": 0.42,
       "cacheRead": 0,
-      "cacheWrite": 0.061
+      "cacheWrite": 0.06
     },
     "contextWindow": 256000,
     "maxTokens": 25600,
@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.84,
-      "output": 2.612,
+      "input": 0.86,
+      "output": 2.806,
       "cacheRead": 0,
-      "cacheWrite": 0.42
+      "cacheWrite": 0.43
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -202,10 +202,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.36,
-      "output": 4.4,
+      "input": 1.332,
+      "output": 4.312,
       "cacheRead": 0,
-      "cacheWrite": 0.68
+      "cacheWrite": 0.666
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -233,9 +233,9 @@
       "text"
     ],
     "cost": {
-      "input": 1.1,
-      "output": 3.851,
-      "cacheRead": 0.275,
+      "input": 1.52432,
+      "output": 4.79072,
+      "cacheRead": 0.152432,
       "cacheWrite": 0
     },
     "contextWindow": 1000000,
@@ -264,10 +264,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.16332,
-      "output": 0.65328,
-      "cacheRead": 0.0152432,
-      "cacheWrite": 0
+      "input": 0.188,
+      "output": 0.7,
+      "cacheRead": 0,
+      "cacheWrite": 0.094
     },
     "contextWindow": 131072,
     "maxTokens": 13107,
@@ -295,10 +295,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.5744,
-      "output": 3.005,
+      "input": 0.5204,
+      "output": 2.735,
       "cacheRead": 0,
-      "cacheWrite": 0.2872
+      "cacheWrite": 0.2602
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -314,29 +314,29 @@
     "name": "Kimi K2.6",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": null,
+      "off": "off",
       "minimal": null,
-      "low": "low",
-      "medium": "medium",
-      "high": "high",
+      "low": null,
+      "medium": null,
+      "high": null,
       "xhigh": null,
-      "max": null
+      "max": "max"
     },
     "input": [
       "text",
       "image"
     ],
     "cost": {
-      "input": 0.95,
-      "output": 4,
-      "cacheRead": 0.16,
+      "input": 1.03436,
+      "output": 4.3552,
+      "cacheRead": 0.174208,
       "cacheWrite": 0
     },
     "contextWindow": 262000,
     "maxTokens": 26214,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": true,
+      "supportsReasoningEffort": false,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -350,9 +350,9 @@
       "image"
     ],
     "cost": {
-      "input": 0.95,
-      "output": 4,
-      "cacheRead": 0.19,
+      "input": 1.03436,
+      "output": 4.3552,
+      "cacheRead": 0.206872,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -382,9 +382,9 @@
       "image"
     ],
     "cost": {
-      "input": 3,
-      "output": 15,
-      "cacheRead": 0.3,
+      "input": 3.2664,
+      "output": 16.332,
+      "cacheRead": 0.32664,
       "cacheWrite": 0
     },
     "contextWindow": 1048576,
@@ -413,10 +413,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.638,
-      "output": 0.768,
+      "input": 0.598,
+      "output": 0.738,
       "cacheRead": 0,
-      "cacheWrite": 0.319
+      "cacheWrite": 0.299
     },
     "contextWindow": 128000,
     "maxTokens": 12800,
@@ -466,10 +466,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.47,
-      "output": 1.76,
+      "input": 0.41,
+      "output": 1.52,
       "cacheRead": 0,
-      "cacheWrite": 0.235
+      "cacheWrite": 0.205
     },
     "contextWindow": 262100,
     "maxTokens": 6553,
