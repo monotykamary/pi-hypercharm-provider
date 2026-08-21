@@ -35,24 +35,24 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": null,
-      "minimal": null,
+      "off": "none",
+      "minimal": "minimal",
       "low": "low",
-      "medium": null,
+      "medium": "medium",
       "high": "high",
       "xhigh": "xhigh",
-      "max": null
+      "max": "max"
     },
     "input": [
       "text"
     ],
     "cost": {
-      "input": 0.44,
-      "output": 1.32,
-      "cacheRead": 0.044,
+      "input": 0.479072,
+      "output": 1.437216,
+      "cacheRead": 0.0152432,
       "cacheWrite": 0
     },
-    "contextWindow": 1000000,
+    "contextWindow": 1048576,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.86,
-      "output": 2.806,
+      "input": 0.83,
+      "output": 2.558,
       "cacheRead": 0,
-      "cacheWrite": 0.43
+      "cacheWrite": 0.415
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -202,10 +202,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.332,
-      "output": 4.312,
+      "input": 1.36,
+      "output": 4.4,
       "cacheRead": 0,
-      "cacheWrite": 0.666
+      "cacheWrite": 0.68
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -221,16 +221,17 @@
     "name": "GLM-5.2",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": null,
+      "off": "none",
       "minimal": null,
       "low": null,
       "medium": null,
       "high": "high",
-      "xhigh": "xhigh",
-      "max": null
+      "xhigh": null,
+      "max": "max"
     },
     "input": [
-      "text"
+      "text",
+      "image"
     ],
     "cost": {
       "input": 1.52432,
@@ -238,7 +239,7 @@
       "cacheRead": 0.152432,
       "cacheWrite": 0
     },
-    "contextWindow": 1000000,
+    "contextWindow": 1048576,
     "maxTokens": 32768,
     "compat": {
       "supportsStore": false,
@@ -295,10 +296,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.5204,
-      "output": 2.735,
+      "input": 0.5504,
+      "output": 2.885,
       "cacheRead": 0,
-      "cacheWrite": 0.2602
+      "cacheWrite": 0.2752
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -413,10 +414,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.598,
-      "output": 0.738,
+      "input": 0.638,
+      "output": 0.768,
       "cacheRead": 0,
-      "cacheWrite": 0.299
+      "cacheWrite": 0.319
     },
     "contextWindow": 128000,
     "maxTokens": 12800,
@@ -466,10 +467,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.41,
-      "output": 1.52,
+      "input": 0.408,
+      "output": 1.512,
       "cacheRead": 0,
-      "cacheWrite": 0.205
+      "cacheWrite": 0.204
     },
     "contextWindow": 262100,
     "maxTokens": 6553,
