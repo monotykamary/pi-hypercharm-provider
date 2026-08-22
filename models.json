@@ -140,10 +140,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.12,
-      "output": 0.42,
+      "input": 0.11,
+      "output": 0.408,
       "cacheRead": 0,
-      "cacheWrite": 0.06
+      "cacheWrite": 0.055
     },
     "contextWindow": 256000,
     "maxTokens": 25600,
@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.83,
-      "output": 2.558,
+      "input": 0.91,
+      "output": 2.934,
       "cacheRead": 0,
-      "cacheWrite": 0.415
+      "cacheWrite": 0.455
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -296,10 +296,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.5504,
-      "output": 2.885,
+      "input": 0.5444,
+      "output": 2.855,
       "cacheRead": 0,
-      "cacheWrite": 0.2752
+      "cacheWrite": 0.2722
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -389,7 +389,7 @@
       "cacheWrite": 0
     },
     "contextWindow": 1048576,
-    "maxTokens": 131072,
+    "maxTokens": 16000,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
