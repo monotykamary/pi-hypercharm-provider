@@ -36,11 +36,11 @@
     "reasoning": true,
     "thinkingLevelMap": {
       "off": "none",
-      "minimal": "minimal",
+      "minimal": null,
       "low": "low",
-      "medium": "medium",
+      "medium": null,
       "high": "high",
-      "xhigh": "xhigh",
+      "xhigh": null,
       "max": "max"
     },
     "input": [
@@ -97,13 +97,13 @@
     "name": "DeepSeek V4 Pro 0813",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": null,
+      "off": "none",
       "minimal": null,
       "low": "low",
-      "medium": "medium",
+      "medium": null,
       "high": "high",
       "xhigh": null,
-      "max": null
+      "max": "max"
     },
     "input": [
       "text"
@@ -140,10 +140,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.11,
-      "output": 0.408,
+      "input": 0.12,
+      "output": 0.42,
       "cacheRead": 0,
-      "cacheWrite": 0.055
+      "cacheWrite": 0.06
     },
     "contextWindow": 256000,
     "maxTokens": 25600,
@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.86,
-      "output": 2.784,
+      "input": 0.91,
+      "output": 2.814,
       "cacheRead": 0,
-      "cacheWrite": 0.43
+      "cacheWrite": 0.455
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -202,10 +202,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.332,
-      "output": 4.312,
+      "input": 1.36,
+      "output": 4.4,
       "cacheRead": 0,
-      "cacheWrite": 0.666
+      "cacheWrite": 0.68
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -265,10 +265,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.178,
-      "output": 0.68,
+      "input": 0.188,
+      "output": 0.7,
       "cacheRead": 0,
-      "cacheWrite": 0.089
+      "cacheWrite": 0.094
     },
     "contextWindow": 128072,
     "maxTokens": 13107,

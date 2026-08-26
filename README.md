@@ -30,11 +30,11 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.44 | $1.32 |
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
 | DeepSeek V4 Pro 0813 | Text | 1.0M | 262K | $1.44 | $4.31 |
-| Gemma 4 26B A4B | Text | 256K | 26K | $0.11 | $0.41 |
-| GLM-5 | Text | 203K | 20K | $0.86 | $2.78 |
-| GLM-5.1 | Text | 203K | 3K | $1.33 | $4.31 |
+| Gemma 4 26B A4B | Text | 256K | 26K | $0.12 | $0.42 |
+| GLM-5 | Text | 203K | 20K | $0.91 | $2.81 |
+| GLM-5.1 | Text | 203K | 3K | $1.36 | $4.40 |
 | GLM-5.2 | Text + Image | 1.0M | 33K | $1.52 | $4.79 |
-| gpt-oss-120b | Text | 128K | 13K | $0.18 | $0.68 |
+| gpt-oss-120b | Text | 128K | 13K | $0.19 | $0.70 |
 | Kimi K2.5 | Text | 262K | 26K | $0.54 | $2.85 |
 | Kimi K2.6 | Text + Image | 262K | 26K | $1.03 | $4.36 |
 | Kimi K2.7 Code | Text + Image | 262K | 16K | $1.03 | $4.36 |
