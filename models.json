@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.91,
-      "output": 2.814,
+      "input": 0.92,
+      "output": 2.976,
       "cacheRead": 0,
-      "cacheWrite": 0.455
+      "cacheWrite": 0.46
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -202,10 +202,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.36,
-      "output": 4.4,
+      "input": 1.29,
+      "output": 4.22,
       "cacheRead": 0,
-      "cacheWrite": 0.68
+      "cacheWrite": 0.645
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -265,10 +265,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.188,
-      "output": 0.7,
+      "input": 0.178,
+      "output": 0.68,
       "cacheRead": 0,
-      "cacheWrite": 0.094
+      "cacheWrite": 0.089
     },
     "contextWindow": 128072,
     "maxTokens": 13107,
@@ -296,10 +296,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.5444,
-      "output": 2.855,
+      "input": 0.544,
+      "output": 2.76,
       "cacheRead": 0,
-      "cacheWrite": 0.2722
+      "cacheWrite": 0.272
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -423,10 +423,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.598,
-      "output": 0.738,
+      "input": 0.638,
+      "output": 0.768,
       "cacheRead": 0,
-      "cacheWrite": 0.299
+      "cacheWrite": 0.319
     },
     "contextWindow": 128000,
     "maxTokens": 12800,
@@ -476,10 +476,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.41,
-      "output": 1.52,
+      "input": 0.424,
+      "output": 1.612,
       "cacheRead": 0,
-      "cacheWrite": 0.205
+      "cacheWrite": 0.212
     },
     "contextWindow": 262100,
     "maxTokens": 6553,
@@ -749,6 +749,92 @@
     },
     "contextWindow": 1000000,
     "maxTokens": 64000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": false,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
+    "id": "qwen3.8-2.4t-a95b",
+    "name": "Qwen3.8-2.4T-A95B",
+    "reasoning": false,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 2,
+      "output": 6,
+      "cacheRead": 0.25,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 128000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": false,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
+    "id": "qwen3.8-27b",
+    "name": "Qwen3.8-27B",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": "off",
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": null,
+      "xhigh": null,
+      "max": "max"
+    },
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.5,
+      "output": 3,
+      "cacheRead": 0.1,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 128000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": false,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
+    "id": "qwen3.8-flash",
+    "name": "Qwen3.8-Flash",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": "off",
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": null,
+      "xhigh": null,
+      "max": "max"
+    },
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.16,
+      "output": 0.47,
+      "cacheRead": 0.016,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 128000,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": false,
