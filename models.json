@@ -52,7 +52,7 @@
       "cacheRead": 0.044,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 384000,
     "compat": {
       "supportsStore": false,
@@ -171,10 +171,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.92,
-      "output": 2.976,
+      "input": 0.9,
+      "output": 2.804,
       "cacheRead": 0,
-      "cacheWrite": 0.46
+      "cacheWrite": 0.45
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -221,17 +221,16 @@
     "name": "GLM-5.2",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
+      "off": null,
       "minimal": null,
       "low": null,
       "medium": null,
       "high": "high",
-      "xhigh": null,
-      "max": "max"
+      "xhigh": "xhigh",
+      "max": null
     },
     "input": [
-      "text",
-      "image"
+      "text"
     ],
     "cost": {
       "input": 1.52432,
@@ -239,7 +238,7 @@
       "cacheRead": 0.152432,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 32768,
     "compat": {
       "supportsStore": false,
@@ -296,10 +295,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.544,
-      "output": 2.76,
+      "input": 0.5444,
+      "output": 2.855,
       "cacheRead": 0,
-      "cacheWrite": 0.272
+      "cacheWrite": 0.2722
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -423,10 +422,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.638,
-      "output": 0.768,
+      "input": 0.6066,
+      "output": 1.0386,
       "cacheRead": 0,
-      "cacheWrite": 0.319
+      "cacheWrite": 0.3033
     },
     "contextWindow": 128000,
     "maxTokens": 12800,
@@ -476,10 +475,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.424,
-      "output": 1.612,
+      "input": 0.408,
+      "output": 1.512,
       "cacheRead": 0,
-      "cacheWrite": 0.212
+      "cacheWrite": 0.204
     },
     "contextWindow": 262100,
     "maxTokens": 6553,
@@ -828,7 +827,7 @@
       "image"
     ],
     "cost": {
-      "input": 0.16,
+      "input": 0.15,
       "output": 0.47,
       "cacheRead": 0.016,
       "cacheWrite": 0
