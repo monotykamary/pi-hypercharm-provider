@@ -73,11 +73,15 @@
  *     /hypercharm-status reset
  *
  * Usage:
- *   # Option 1: Store in auth.json (recommended)
+ *   # Option 1: OAuth — run pi, send /login, and pick "HyperCharm"
+ *   # (device flow; provider id "hypercharm", distinct from the official
+ *   # @charmland/pi-hyper-provider registration "hyper")
+ *
+ *   # Option 2: Store in auth.json
  *   # Add to ~/.pi/agent/auth.json:
  *   #   "hypercharm": { "type": "api_key", "key": "your-api-key" }
  *
- *   # Option 2: Set as environment variable
+ *   # Option 3: Set as environment variable
  *   export HYPERCHARM_API_KEY=your-api-key
  *
  *   # Run pi with the extension
@@ -90,6 +94,7 @@
 
 import { clampThinkingLevel, streamOpenAICompletions } from "@earendil-works/pi-ai/compat";
 import type { AssistantMessageEventStream, SimpleStreamOptions } from "@earendil-works/pi-ai/compat";
+import { USER_AGENT, loginHypercharm, refreshHypercharmToken } from "./oauth";
 import { getAgentDir, type ExtensionAPI, type ExtensionContext, type ModelRegistry } from "@earendil-works/pi-coding-agent";
 import modelsData from "./models.json" with { type: "json" };
 import customModelsData from "./custom-models.json" with { type: "json" };
@@ -302,7 +307,7 @@ function transformApiModel(apiModel: any): JsonModel | null {
 async function fetchLiveModels(apiKey: string, signal?: AbortSignal): Promise<JsonModel[] | null> {
 	try {
 		const response = await fetch(MODELS_URL, {
-			headers: { Authorization: `Bearer ${apiKey}` },
+			headers: { Authorization: `Bearer ${apiKey}`, "User-Agent": USER_AGENT },
 			signal: signal ? AbortSignal.any([AbortSignal.timeout(LIVE_FETCH_TIMEOUT_MS), signal]) : AbortSignal.timeout(LIVE_FETCH_TIMEOUT_MS),
 		});
 		if (!response.ok) return null;
@@ -634,7 +639,7 @@ let metaFetched = false;
 async function fetchJsonGet(url: string, apiKey: string, signal?: AbortSignal): Promise<any | null> {
 	try {
 		const response = await fetch(url, {
-			headers: { Authorization: `Bearer ${apiKey}` },
+			headers: { Authorization: `Bearer ${apiKey}`, "User-Agent": USER_AGENT },
 			signal: signal
 				? AbortSignal.any([AbortSignal.timeout(ACCOUNT_FETCH_TIMEOUT_MS), signal])
 				: AbortSignal.timeout(ACCOUNT_FETCH_TIMEOUT_MS),
@@ -656,9 +661,12 @@ function refreshCredits(apiKey: string | undefined, signal: AbortSignal | undefi
 		try {
 			const data = await fetchJsonGet(`${BASE_URL}/credits`, apiKey, signal);
 			if (data === null) return;
-			const balance = data?.balance;
-			if (typeof balance === "number" && Number.isFinite(balance)) {
-				account.balance = balance;
+			// /credits can report hypercredits ("balance") or USD ("balance_usd",
+			// USD-billed accounts). Handle both at the observed 20 hc = $1 rate so a
+			// server-side unit switch can never silently freeze the balance readout.
+			const rawBalance = typeof data?.balance === "number" ? data.balance : typeof data?.balance_usd === "number" ? data.balance_usd * 20 : undefined;
+			if (typeof rawBalance === "number" && Number.isFinite(rawBalance)) {
+				account.balance = rawBalance;
 			}
 		} finally {
 			creditsInFlight = null;
@@ -1007,6 +1015,12 @@ function makeProviderConfig(models: JsonModel[] = currentModels) {
 		api: "hypercharm",
 		models,
 		streamSimple: streamHypercharm,
+		oauth: {
+			name: "HyperCharm",
+			login: (callbacks) => loginHypercharm(callbacks),
+			refreshToken: (credentials, signal) => refreshHypercharmToken(credentials, signal),
+			getApiKey: (credentials) => String(credentials.access ?? ""),
+		},
 	};
 }
 

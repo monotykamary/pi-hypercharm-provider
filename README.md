@@ -18,6 +18,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 - **31+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
+- **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
 - **Official Catalog Sync** from Charm's typed `/v1/provider` endpoint, matching `@charmland/pi-hyper-provider`
 - **Reasoning Models** with provider-published on/off states and exact effort levels
 - **Attachment Support** for models the official catalog marks as attachment-capable
@@ -181,13 +182,14 @@ Non-interactive toggles:
 
 The HyperCharm API key can be configured in multiple ways (resolved in this order):
 
-1. **`auth.json`** (recommended) — Add to `~/.pi/agent/auth.json`:
+1. **OAuth** — Run `pi`, send `/login`, and pick **HyperCharm**. This uses Hyper's device flow (open the verification URL, enter the code) and stores a refreshable OAuth credential under the `hypercharm` provider — fully independent of the official `@charmland/pi-hyper-provider` (`hyper`) registration, so both extensions can be installed side by side.
+2. **`auth.json`** (recommended for API keys) — Add to `~/.pi/agent/auth.json`:
    ```json
    { "hypercharm": { "type": "api_key", "key": "your-api-key" } }
    ```
    The `key` field supports literal values, env var names, and shell commands (prefix with `!`). See [pi's auth file docs](https://github.com/badlogic/pi-mono) for details.
-2. **Runtime override** — Use the `--api-key` CLI flag
-3. **Environment variable** — Set `HYPERCHARM_API_KEY`
+3. **Runtime override** — Use the `--api-key` CLI flag
+4. **Environment variable** — Set `HYPERCHARM_API_KEY`
 
 Get your API key from [hyper.charm.land](https://hyper.charm.land).
 
@@ -217,7 +219,8 @@ Model metadata matches Charm's official [`@charmland/pi-hyper-provider`](https:/
 - `thinkingFormat: "deepseek"`, which maps Pi thinking levels onto Hyper's `thinking` envelope
 - `reasoning_effort` only when the catalog publishes concrete level names
 - `maxTokensField: "max_tokens"` and `supportsStore: false`
-- zero `cacheWrite`, because Hyper reports discounted cached-output pricing, not cache-write cost
+- `cacheRead` from `cost_per_1m_out_cached` (discounted cached-output price) and `cacheWrite` from `cost_per_1m_in_cached`, exactly as the official provider maps them
+- `/v1/credits` balance accepted in either hypercredits (`balance`) or USD (`balance_usd`, converted at the observed 20 hc = $1 rate)
 
 `patch.json` is reserved only for a verified provider regression and is currently empty.
 
