@@ -140,10 +140,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.12,
-      "output": 0.42,
+      "input": 0.116,
+      "output": 0.38,
       "cacheRead": 0,
-      "cacheWrite": 0.06
+      "cacheWrite": 0.058
     },
     "contextWindow": 256000,
     "maxTokens": 25600,
@@ -234,10 +234,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.91,
-      "output": 2.934,
+      "input": 0.85,
+      "output": 2.774,
       "cacheRead": 0,
-      "cacheWrite": 0.455
+      "cacheWrite": 0.425
     },
     "contextWindow": 202752,
     "maxTokens": 20275,
@@ -265,10 +265,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.332,
-      "output": 4.312,
+      "input": 1.29,
+      "output": 4.22,
       "cacheRead": 0,
-      "cacheWrite": 0.666
+      "cacheWrite": 0.645
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -327,16 +327,47 @@
       "text"
     ],
     "cost": {
-      "input": 0.19,
-      "output": 0.63,
+      "input": 0.188,
+      "output": 0.7,
       "cacheRead": 0,
-      "cacheWrite": 0.095
+      "cacheWrite": 0.094
     },
     "contextWindow": 128072,
     "maxTokens": 13107,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
+    "id": "kimi-k2-thinking",
+    "name": "Kimi K2 Thinking",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": "off",
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": null,
+      "xhigh": null,
+      "max": "max"
+    },
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.6,
+      "output": 2.5,
+      "cacheRead": 0,
+      "cacheWrite": 0.3
+    },
+    "contextWindow": 262144,
+    "maxTokens": 26214,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": false,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -358,10 +389,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.5504,
-      "output": 2.885,
+      "input": 0.5284,
+      "output": 2.785,
       "cacheRead": 0,
-      "cacheWrite": 0.2752
+      "cacheWrite": 0.2642
     },
     "contextWindow": 262144,
     "maxTokens": 26214,
@@ -538,10 +569,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.404,
-      "output": 1.496,
+      "input": 0.426,
+      "output": 1.62,
       "cacheRead": 0,
-      "cacheWrite": 0.202
+      "cacheWrite": 0.213
     },
     "contextWindow": 262100,
     "maxTokens": 6553,
