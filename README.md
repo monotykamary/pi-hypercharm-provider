@@ -15,7 +15,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 
 ## Features
 
-- **32+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **33+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -38,6 +38,7 @@ _Hyperoptimized coding models — DeepSeek, GLM, Kimi, Qwen, MiniMax, Gemma, GPT
 | GLM-5.1 | Text | 203K | 3K | $1.26 | $4.13 |
 | GLM-5.2 | Text | 1.0M | 33K | $1.52 | $4.79 |
 | gpt-oss-120b | Text | 128K | 13K | $0.19 | $0.70 |
+| Inkling | Text + Image | 1.0M | 33K | $1.09 | $4.41 |
 | Kimi K2 Thinking | Text | 262K | 26K | $0.60 | $2.50 |
 | Kimi K2.5 | Text | 262K | 26K | $0.51 | $2.75 |
 | Kimi K2.6 | Text + Image | 262K | 26K | $1.03 | $4.36 |
