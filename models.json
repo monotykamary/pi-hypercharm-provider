@@ -35,7 +35,7 @@
     "name": "DeepSeek V4 Flash 0731",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
+      "off": null,
       "minimal": null,
       "low": "low",
       "medium": null,
@@ -265,10 +265,10 @@
       "text"
     ],
     "cost": {
-      "input": 1.358,
-      "output": 4.268,
+      "input": 1.386,
+      "output": 4.356,
       "cacheRead": 0,
-      "cacheWrite": 0.679
+      "cacheWrite": 0.693
     },
     "contextWindow": 202750,
     "maxTokens": 3276,
@@ -327,10 +327,10 @@
       "text"
     ],
     "cost": {
-      "input": 0.178,
-      "output": 0.68,
+      "input": 0.18,
+      "output": 0.61,
       "cacheRead": 0,
-      "cacheWrite": 0.089
+      "cacheWrite": 0.09
     },
     "contextWindow": 128072,
     "maxTokens": 13107,
@@ -696,13 +696,13 @@
     "name": "Qwen3.6-Flash",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -718,7 +718,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -728,13 +728,13 @@
     "name": "Qwen3.6-Max",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text"
@@ -749,7 +749,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -759,13 +759,13 @@
     "name": "Qwen3.6-Plus",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -781,7 +781,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -791,13 +791,13 @@
     "name": "Qwen3.7-Flash",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -813,7 +813,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -823,13 +823,13 @@
     "name": "Qwen3.7-Max",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text"
@@ -844,7 +844,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -854,13 +854,13 @@
     "name": "Qwen3.7-Plus",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -876,7 +876,7 @@
     "maxTokens": 64000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -884,7 +884,16 @@
   {
     "id": "qwen3.8-2.4t-a95b",
     "name": "Qwen3.8-2.4T-A95B",
-    "reasoning": false,
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": null,
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
+      "xhigh": null,
+      "max": null
+    },
     "input": [
       "text"
     ],
@@ -898,7 +907,7 @@
     "maxTokens": 128000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -908,13 +917,13 @@
     "name": "Qwen3.8-27B",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -930,7 +939,7 @@
     "maxTokens": 128000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -940,13 +949,13 @@
     "name": "Qwen3.8-Flash",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -962,7 +971,7 @@
     "maxTokens": 128000,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
@@ -972,13 +981,13 @@
     "name": "Qwen3.8-Max",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -994,7 +1003,7 @@
     "maxTokens": 65536,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
