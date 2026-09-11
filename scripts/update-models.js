@@ -9,8 +9,10 @@
  *
  * The endpoint provides canonical names, $/M pricing, context/output limits,
  * can_reason, optional reasoning levels, and attachment support. models.json is
- * pure API data. patch.json is reserved for verified endpoint regressions and
- * currently contains no overrides.
+ * pure API data. patch.json is reserved for verified endpoint regressions; it
+ * currently restores Pi's max thinking level on the DeepSeek V4 models whose
+ * catalog reasoning_levels no longer publish it. Patch entries replace
+ * thinkingLevelMap wholesale, so each one carries the model's full level map.
  *
  * Merge order for README: models.json → apply patch.json → merge custom-models.json
  *

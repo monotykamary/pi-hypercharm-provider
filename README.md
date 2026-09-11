@@ -225,11 +225,18 @@ Model metadata matches Charm's official [`@charmland/pi-hyper-provider`](https:/
 - `cacheRead` from `cost_per_1m_out_cached` (discounted cached-output price) and `cacheWrite` from `cost_per_1m_in_cached`, exactly as the official provider maps them
 - `/v1/credits` balance accepted in either hypercredits (`balance`) or USD (`balance_usd`, converted at the observed 20 hc = $1 rate)
 
-`patch.json` is reserved only for a verified provider regression and is currently empty.
+`patch.json` is reserved for verified provider regressions. It currently re-exposes Pi's `max` thinking level on the DeepSeek V4 models whose catalog `reasoning_levels` dropped it (`deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-v4.1-flash`), matching the levels their pinned snapshots still publish.
 
 ### Patch Overrides
 
-`patch.json` is applied on top of `models.json` only for verified endpoint corrections. It is currently empty because every live field comes from Charm's canonical provider catalog.
+`patch.json` is applied on top of `models.json` only for verified endpoint corrections; every other live field comes from Charm's canonical provider catalog.
+
+| Model | Override | Why |
+|-------|----------|-----|
+| `deepseek-v4-flash`, `deepseek-v4-pro` | `thinkingLevelMap.max = "max"` | The catalog now publishes only `high,xhigh`, while the pinned `-0731`/`-0813` snapshots publish `max`. |
+| `deepseek-v4.1-flash` | `thinkingLevelMap.max = "max"` | The catalog publishes `low,high,xhigh`; `max` mirrors the sibling DeepSeek V4 entries. |
+
+Each entry carries the model's full level map, because `patch.json` replaces `thinkingLevelMap` wholesale rather than merging it.
 
 ## Updating Models
 
