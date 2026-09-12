@@ -172,9 +172,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.122,
-      "output": 0.42,
-      "cacheRead": 0.061,
+      "input": 0.102,
+      "output": 0.356,
+      "cacheRead": 0.051,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -268,7 +268,7 @@
     ],
     "cost": {
       "input": 0.86,
-      "output": 2.784,
+      "output": 2.752,
       "cacheRead": 0.43,
       "cacheWrite": 0
     },
@@ -298,9 +298,9 @@
       "text"
     ],
     "cost": {
-      "input": 1.326,
-      "output": 4.22,
-      "cacheRead": 0.663,
+      "input": 1.318,
+      "output": 4.308,
+      "cacheRead": 0.659,
       "cacheWrite": 0
     },
     "contextWindow": 202750,
@@ -360,9 +360,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.178,
-      "output": 0.68,
-      "cacheRead": 0.089,
+      "input": 0.168,
+      "output": 0.66,
+      "cacheRead": 0.084,
       "cacheWrite": 0
     },
     "contextWindow": 128072,
@@ -612,9 +612,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.274,
-      "output": 0.8992,
-      "cacheRead": 0.137,
+      "input": 0.255,
+      "output": 0.8365,
+      "cacheRead": 0.1275,
       "cacheWrite": 0
     },
     "contextWindow": 430000,
@@ -634,9 +634,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.404,
-      "output": 1.496,
-      "cacheRead": 0.202,
+      "input": 0.396,
+      "output": 1.464,
+      "cacheRead": 0.198,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
