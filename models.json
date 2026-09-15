@@ -97,7 +97,7 @@
     "name": "DeepSeek V4 Pro 0813",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "none",
+      "off": null,
       "minimal": null,
       "low": "low",
       "medium": null,
@@ -114,7 +114,7 @@
       "cacheRead": 0.0479072,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
+    "contextWindow": 1000000,
     "maxTokens": 262144,
     "compat": {
       "supportsStore": false,
@@ -133,21 +133,21 @@
       "low": "low",
       "medium": null,
       "high": "high",
-      "xhigh": "xhigh",
-      "max": null
+      "xhigh": null,
+      "max": "max"
     },
     "input": [
       "text",
       "image"
     ],
     "cost": {
-      "input": 0.3,
-      "output": 1.2,
-      "cacheRead": 0.03,
+      "input": 0.32664,
+      "output": 1.30656,
+      "cacheRead": 0.032664,
       "cacheWrite": 0
     },
-    "contextWindow": 1048576,
-    "maxTokens": 26214,
+    "contextWindow": 1000000,
+    "maxTokens": 13107,
     "compat": {
       "supportsStore": false,
       "supportsReasoningEffort": true,
@@ -172,9 +172,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.102,
-      "output": 0.356,
-      "cacheRead": 0.051,
+      "input": 0.1,
+      "output": 0.374,
+      "cacheRead": 0.05,
       "cacheWrite": 0
     },
     "contextWindow": 256000,
@@ -267,9 +267,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.86,
-      "output": 2.752,
-      "cacheRead": 0.43,
+      "input": 0.94,
+      "output": 3.008,
+      "cacheRead": 0.47,
       "cacheWrite": 0
     },
     "contextWindow": 202752,
@@ -299,7 +299,7 @@
     ],
     "cost": {
       "input": 1.318,
-      "output": 4.308,
+      "output": 4.268,
       "cacheRead": 0.659,
       "cacheWrite": 0
     },
@@ -360,9 +360,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.168,
-      "output": 0.66,
-      "cacheRead": 0.084,
+      "input": 0.178,
+      "output": 0.68,
+      "cacheRead": 0.089,
       "cacheWrite": 0
     },
     "contextWindow": 128072,
@@ -454,9 +454,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.5584,
-      "output": 2.935,
-      "cacheRead": 0.2792,
+      "input": 0.5344,
+      "output": 2.815,
+      "cacheRead": 0.2672,
       "cacheWrite": 0
     },
     "contextWindow": 262144,
@@ -503,16 +503,7 @@
   {
     "id": "kimi-k2.7-code",
     "name": "Kimi K2.7 Code",
-    "reasoning": true,
-    "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
-      "xhigh": null,
-      "max": "max"
-    },
+    "reasoning": false,
     "input": [
       "text",
       "image"
@@ -523,7 +514,7 @@
       "cacheRead": 0.206872,
       "cacheWrite": 0
     },
-    "contextWindow": 262000,
+    "contextWindow": 256000,
     "maxTokens": 16000,
     "compat": {
       "supportsStore": false,
@@ -634,9 +625,9 @@
       "text"
     ],
     "cost": {
-      "input": 0.396,
-      "output": 1.464,
-      "cacheRead": 0.198,
+      "input": 0.462,
+      "output": 1.728,
+      "cacheRead": 0.231,
       "cacheWrite": 0
     },
     "contextWindow": 262100,
