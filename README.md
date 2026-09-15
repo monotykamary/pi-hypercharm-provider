@@ -168,6 +168,7 @@ Edit `~/.pi/agent/extensions/hypercharm.json` or run `/hypercharm-status`:
 | `account` | `widget` \| `statusbar` \| `off` | `widget` |
 | `hideOnOtherProvider` | `true` \| `false` | `true` |
 | `lowBalanceHc` | number \| `null` | `25` |
+| `glyphs` | `auto` \| `unicode` \| `ascii` | `auto` |
 
 Non-interactive toggles:
 
@@ -176,9 +177,19 @@ Non-interactive toggles:
 /hypercharm-status account widget|statusbar|off
 /hypercharm-status hide true|false
 /hypercharm-status lowBalance 50|off
+/hypercharm-status glyphs auto|unicode|ascii
 /hypercharm-status refresh
 /hypercharm-status reset
 ```
+
+`glyphs: "auto"` replaces the footer glyphs (bolt, gem, warning, auth arrow,
+separator) with ASCII equivalents on legacy terminals (mintty/Cygwin), whose
+cell-width tables disagree with the extension's width math. There a
+full-width widget line can wrap physically, which desynchronizes pi's
+renderer and leaves stale rows behind. The widget also never paints the
+terminal's last column, and clamps an explicit `unicode` choice to ASCII on
+legacy terminals; the statusbar is not edge-padded and always honors the
+exact choice.
 
 
 ## Authentication
