@@ -7,8 +7,9 @@
   "scripts": {
     "clean": "echo 'nothing to clean'",
     "build": "echo 'nothing to build'",
-    "check": "tsc --noEmit && node tests/status.smoke.ts",
+    "check": "tsc --noEmit && npm run smoke && npm test",
     "smoke": "node tests/status.smoke.ts",
+    "test": "node --import jiti/register --test tests/identity.test.ts tests/prism.test.ts tests/notify.test.ts tests/provider.integration.test.ts",
     "update-models": "node scripts/update-models.js"
   },
   "keywords": [
@@ -28,10 +29,15 @@
     "gemma",
     "gpt-oss"
   ],
+  "peerDependencies": {
+    "@earendil-works/pi-tui": "*"
+  },
   "devDependencies": {
     "@earendil-works/pi-ai": "0.85.1",
     "@earendil-works/pi-coding-agent": "0.85.1",
+    "@earendil-works/pi-tui": "0.85.1",
     "@types/node": "^24.10.1",
+    "jiti": "2.7.0",
     "typescript": "6.0.3"
   },
   "author": "",
