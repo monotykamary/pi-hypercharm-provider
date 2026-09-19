@@ -33,12 +33,15 @@
  *   The right side compresses across progressive tiers as the terminal
  *   narrows. The balance flips to a ⚠ warning at/below lowBalanceHc.
  *
- *   Lifecycle (mirrors pi-neuralwatt-provider): nothing renders before this
- *   session's first HyperCharm turn completes, so fresh sessions and other
- *   providers' sessions see no half-empty line. Credits/team are prefetched
- *   on session start or model select when a HyperCharm model is active, so
- *   the first turn ends with data already cached. The balance is polled
- *   again on pi's agent_settled event (fires only once no automatic retry,
+ *   Lifecycle (mirrors pi-neuralwatt-provider): selecting a HyperCharm model
+ *   shows the line — the account side renders as soon as the credits/team
+ *   prefetch lands, and the session side (spend/requests) joins it on the
+ *   first completed turn. hideOnOtherProvider (default true) clears
+ *   everything the moment the active model belongs to another provider.
+ *   Credits/team are prefetched on session start or model select when a
+ *   HyperCharm model is active, so the first turn ends with data already
+ *   cached. The balance is polled again on pi's agent_settled event (fires
+ *   only once no automatic retry,
  *   compaction, or queued continuation can follow) — and nowhere else, so
  *   sessions without HyperCharm turns make zero status-related API calls.
  *   Between polls the balance moves optimistically: each turn's
@@ -827,10 +830,13 @@ function renderStatus(ctx: ExtensionContext): void {
 		widgetGlyphClampNotified = true;
 		ctx.ui.notify("HyperCharm: widget glyphs stay ASCII on this terminal — unicode glyphs overflow legacy mintty/Cygwin cell widths. Statusbar is unaffected.", "info");
 	}
-	// Show only after HyperCharm activity this session (like pi-neuralwatt):
-	// no empty-gap line on fresh sessions, no stale account glare on other
-	// providers' sessions.
-	const accountVisible = statusConfig.account !== "off" && accountHasData(account) && hasActivity;
+	// Show while HyperCharm is the selected provider — the account side renders
+	// as soon as the session_start/model_select credits fetch lands, with no
+	// need to wait for a turn — and once this session recorded HyperCharm
+	// activity, which is what keeps the line alive after a switch when
+	// hideOnOtherProvider is false. The default true clears it on the switch.
+	const visible = hasActivity || provider === PROVIDER_ID;
+	const accountVisible = statusConfig.account !== "off" && accountHasData(account) && visible;
 	const lowBalance =
 		statusConfig.lowBalanceHc !== null && account.balance !== null && account.balance <= statusConfig.lowBalanceHc;
 	const sessionLine = statusConfig.session !== "off" ? buildSessionLine(sessionStats, glyphs) : undefined;
@@ -1151,7 +1157,7 @@ export default function (pi: ExtensionAPI) {
 
 		loadStatusConfig();
 		resetStatusState();
-		updateStatus(ctx); // clears any carryover; activity-gated, renders nothing yet
+		updateStatus(ctx); // clears any carryover; the account side lands with the credits fetch
 		// Re-register so our identity (custom api + streamSimple) always wins
 		// over anything that touched provider registration during load.
 		pi.registerProvider(PROVIDER_ID, makeProviderConfig());
@@ -1187,8 +1193,11 @@ export default function (pi: ExtensionAPI) {
 		updateStatus(ctx);
 		const model: any = (event as any).model;
 		if (model?.provider === PROVIDER_ID && cachedApiKey) {
+			// Both refreshes repaint when they land: selection alone must fill in
+			// the account side (balance now, team/auth atoms a moment later)
+			// instead of leaving a bare gem until the next turn.
 			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false), ctx);
-			void refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
+			updateStatusAfter(refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined), ctx);
 		}
 	});
 

@@ -80,6 +80,11 @@ function captureUI(runner) {
 	const notifications = [];
 	const statusKeys = [];
 	const widgetKeys = [];
+	// Install (component factory) vs clear (undefined), split so a test can
+	// assert both "the widget popped up" and "the widget went away".
+	const widgetInstalls = [];
+	const widgetClears = [];
+	const widgetRenders = [];
 	const base = runner.createContext().ui ?? {};
 	const ui = {
 		...base,
@@ -90,12 +95,24 @@ function captureUI(runner) {
 		setStatus: (key) => {
 			statusKeys.push(String(key));
 		},
-		setWidget: (key) => {
-			widgetKeys.push(String(key));
+		setWidget: (key, value) => {
+			const name = String(key);
+			widgetKeys.push(name);
+			if (value === undefined) {
+				widgetClears.push(name);
+				return;
+			}
+			widgetInstalls.push(name);
+			try {
+				const component = value(undefined, ui.theme);
+				widgetRenders.push(component?.render ? component.render(80).join("\n") : "");
+			} catch {
+				widgetRenders.push("");
+			}
 		},
 	};
 	runner.setUIContext(ui, "tui");
-	return { notifications, statusKeys, widgetKeys };
+	return { notifications, statusKeys, widgetKeys, widgetInstalls, widgetClears, widgetRenders };
 }
 
 async function load(options = {}) {
@@ -410,6 +427,58 @@ test("co-installs with the official identifier surface without interference", as
 			assert.ok(key.startsWith("hypercharm"), "widget key must stay namespaced: " + key);
 		}
 		assert.equal(ui.statusKeys.includes("hyper") && ownKeys.includes("hyper"), false);
+	} finally {
+		harness.session.dispose();
+	}
+});
+
+test("shows the footer widget on model selection and clears it when the provider is deselected", async () => {
+	const requests = [];
+	const json = (body) => new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+	const accountApi = async (input) => {
+		const url = String(input);
+		requests.push(url);
+		if (url.endsWith("/credits")) return json({ balance: 249 });
+		if (url.endsWith("/teams")) return json({ items: [{ name: "Xu's Team" }] });
+		if (url.endsWith("/devices")) return json({ items: [] });
+		if (url.endsWith("/provider")) return json({ models: [FIXTURE_MODEL] });
+		throw new Error("unexpected request: " + url);
+	};
+	const harness = await load({ extensionPaths: [extensionPath, officialSurfacePath], fetchImpl: accountApi });
+	try {
+		// The model_select handler only refreshes credits once session_start has
+		// cached a key, so wait for the catalog refresh that follows resolution.
+		await waitFor("session-start catalog refresh", () =>
+			requests.some((url) => url.endsWith("/provider")) ? true : undefined,
+		);
+
+		const ui = captureUI(harness.runner);
+		const ours = harness.runtime.getModel("hypercharm", "deepseek-v4-flash");
+		assert.ok(ours, "embedded catalog serves deepseek-v4-flash");
+		await harness.session.setModel(ours);
+		// No turn_end is ever emitted in this test: selection alone must install
+		// the widget, with the account side already filled in.
+		await waitFor("widget installed on selection", () => (ui.widgetInstalls.includes("hypercharm") ? true : undefined));
+		const filled = await waitFor("account side in the widget", () =>
+			ui.widgetRenders.find((line) => line.includes("Xu's Team")),
+		);
+		assert.match(filled, /249 hc/, "balance renders from the credits prefetch");
+
+		const installsWhileSelected = ui.widgetInstalls.length;
+		await harness.credentials.modify("hyper", async () => ({ type: "api_key", key: "fixture-official-key" }));
+		const official = harness.runtime.getModel("hyper", "glm-5.3");
+		assert.ok(official, "the official-surface fixture serves glm-5.3");
+		await harness.session.setModel(official);
+		await waitFor("widget cleared on deselect", () => (ui.widgetClears.includes("hypercharm") ? true : undefined));
+
+		// Deselected stays deselected: another provider's turn must not bring the
+		// line back (hideOnOtherProvider defaults to true).
+		await harness.runner.emit({ type: "turn_end", turnIndex: 0, message: assistantMessage(), toolResults: [] });
+		assert.equal(
+			ui.widgetInstalls.length,
+			installsWhileSelected,
+			"no reinstall while another provider's model is active",
+		);
 	} finally {
 		harness.session.dispose();
 	}

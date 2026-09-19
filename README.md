@@ -138,11 +138,13 @@ DeepSeek V4 models use the `deepseek` thinking format — the same native format
 
 ## Footer Status
 
-A Neuralwatt-style status line sits below the editor. It appears after the
-session's first HyperCharm turn completes (never before — no half-empty line
-on fresh sessions or other providers), refreshes its balance when the agent
-run fully settles, and makes no status-related API calls in sessions that
-never use HyperCharm:
+A Neuralwatt-style status line sits below the editor. It appears as soon as a
+HyperCharm model is selected — the account side (team, balance, rate limits)
+renders when the session-start or model-select credits fetch lands, and the
+session side joins it after the first HyperCharm turn completes. Selecting
+another provider hides it (`hideOnOtherProvider` defaults to `true`), the
+balance refreshes when the agent run fully settles, and sessions that never
+use HyperCharm make no status-related API calls:
 
 ```
 ⚡ 1.24 hc · 7 req                       Xu's Team ◆ 249 hc · 996/1k/h · 29d
