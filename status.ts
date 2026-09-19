@@ -21,10 +21,13 @@
  *     or when the glyphs config asks for it (see GlyphMode). Older mintty
  *     builds measure these glyphs with cell tables that disagree with the
  *     ones above; the statusbar absorbs that (its lines are not edge-padded)
- *     but the full-width widget line wraps, which desyncs pi's row
- *     bookkeeping and leaves ghost rows behind.
- *   - render() budgets width − 1, so the widget never paints the terminal's
- *     last column (the classic pending-wrap hazard).
+ *     but a glyph the terminal renders wider than the math above measures it
+ *     overflows the widget line, which desyncs pi's row bookkeeping and
+ *     leaves ghost rows behind.
+ *   - render() budgets the terminal's full width, so the right zone ends
+ *     flush with the last column. Overlong lines are what pi rejects — its
+ *     renderer throws when a line's visible width exceeds the terminal — so
+ *     the width math above must never undercount a glyph.
  */
 
 export type DisplayMode = "widget" | "statusbar" | "off";
@@ -299,10 +302,16 @@ export function termVisWidth(str: string): number {
 export function truncateAnsi(str: string, maxCols: number, ellipsis = "…"): string {
 	if (maxCols <= 0) return "";
 	if (termVisWidth(str) <= maxCols) return str;
+	// Reserve the ellipsis's own width, not a fixed column: ASCII "..." is
+	// three cells, and a line that overshoots the terminal is what pi's
+	// renderer rejects — it throws instead of wrapping. An ellipsis too wide
+	// for the budget is itself cut to it.
+	const ellipsisWidth = termVisWidth(ellipsis);
+	if (ellipsisWidth >= maxCols) return truncateAnsi(ellipsis, maxCols, "");
 	let result = "";
 	let visWidth = 0;
 	let i = 0;
-	const target = maxCols - 1;
+	const target = maxCols - ellipsisWidth;
 	while (i < str.length) {
 		const code = str.charCodeAt(i);
 		if (code === 0x1b && i + 1 < str.length && str.charCodeAt(i + 1) === 0x5b) {
@@ -360,10 +369,14 @@ export class StatusLineWidget {
 	invalidate(): void {}
 
 	render(width: number): string[] {
-		// Never paint the terminal's last column: writing the final cell marks a
-		// pending wrap on legacy terminals, and any real-vs-table width
-		// disagreement then scrolls the frame and desyncs pi's row bookkeeping.
-		const w = Math.max(1, width - 1);
+		// Budget the terminal's full width, so the right zone ends flush with the
+		// last column. pi's built-in footer right-aligns its model/thinking text
+		// the same way and both rows share one frame, so holding a column back
+		// reads as a gap under a flush right edge. pi clears each line before
+		// writing it and separates rows with CR/LF, so ending on the final column
+		// carries no wrap hazard — the lines its renderer rejects are the
+		// overlong ones.
+		const w = Math.max(1, width);
 		const leftVis = termVisWidth(this.leftRaw);
 		if (leftVis > w) {
 			return [this.theme.fg("dim", truncateAnsi(this.leftRaw, w, this.glyphs.ellipsis))];

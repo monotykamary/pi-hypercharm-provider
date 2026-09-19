@@ -101,38 +101,40 @@ const left = buildSessionLine({ requests: 7, spendHc: 1.24 })!;
 assert.ok(left.startsWith("\u26A1 "), "unicode glyph set is the default");
 const widget = new StatusLineWidget(fakeTheme, left, tiers, false);
 
-// Wide: full tier, left-right justified at width − 1 (the widget never
-// paints the terminal's last column — legacy terminals treat that cell as a
-// pending wrap).
+// Wide: full tier, left-right justified to the terminal's last column
+// (pi's built-in footer right-aligns its model text the same way, so both
+// rows end flush).
 const wide = widget.render(80);
 assert.equal(wide.length, 1);
-assert.equal(termVisWidth(wide[0]), 79);
+assert.equal(termVisWidth(wide[0]), 80);
 assert.ok(stripAnsi(wide[0]).startsWith("⚡ 1.24 hc"));
 assert.ok(stripAnsi(wide[0]).endsWith("⟳ 29d"));
 
-// Medium: drops to a compressed tier, still exactly width − 1
+// Medium: drops to a compressed tier, still exactly width
 const med = widget.render(52);
-assert.equal(termVisWidth(med[0]), 51);
+assert.equal(termVisWidth(med[0]), 52);
 assert.ok(!stripAnsi(med[0]).includes("⟳"), "compressed tiers drop auth first");
 
 // Narrow: no tier fits → left only, padded
 const narrow = widget.render(termVisWidth(left) + 3);
-assert.equal(termVisWidth(narrow[0]), termVisWidth(left) + 2);
+assert.equal(termVisWidth(narrow[0]), termVisWidth(left) + 3);
 assert.ok(stripAnsi(narrow[0]).startsWith("⚡"));
 assert.ok(!stripAnsi(narrow[0]).includes("◆"));
 
 // Narrower than left itself: truncation never overflows (crash guard)
 const tiny = widget.render(10);
-assert.equal(termVisWidth(tiny[0]), 9);
+assert.equal(termVisWidth(tiny[0]), 10);
 
 // Left empty (session gated) → right-aligned account line
 const rightOnly = new StatusLineWidget(fakeTheme, "", tiers, false);
 const ro = rightOnly.render(70);
-assert.equal(termVisWidth(ro[0]), 69);
+assert.equal(termVisWidth(ro[0]), 70, "account side hugs the last column");
+assert.equal(stripAnsi(ro[0]).length - stripAnsi(ro[0]).trimStart().length, 70 - termVisWidth(tiers[0]),
+  "left zone stays empty: account text starts where the tier width demands");
 assert.ok(stripAnsi(ro[0]).endsWith("⟳ 29d"));
 
 // No data at all
-assert.deepEqual(new StatusLineWidget(fakeTheme, "", [], false).render(40), [fakeTheme.fg("dim", "") + " ".repeat(39)]);
+assert.deepEqual(new StatusLineWidget(fakeTheme, "", [], false).render(40), [fakeTheme.fg("dim", "") + " ".repeat(40)]);
 
 // Warning color wired through
 const warn = new StatusLineWidget(fakeTheme, "", buildAccountTiers(acc({ balance: 10 }), true), true);
@@ -197,11 +199,25 @@ assert.ok(asciiTiers[0].endsWith("~ 29d"), `got ${asciiTiers[0]}`);
 const asciiWidget = new StatusLineWidget(fakeTheme, asciiLine, asciiTiers, true, ASCII_GLYPHS).render(60)[0];
 assert.equal([...stripAnsi(asciiWidget)].every((c) => c.charCodeAt(0) < 128), true);
 
+// ASCII truncation must fit the width too: the three-cell "..." used to
+// overshoot by two columns on a narrow terminal, and pi's renderer throws
+// on an overlong line instead of wrapping it.
+for (const width of [10, 14, 17]) {
+	const line = new StatusLineWidget(fakeTheme, asciiLine, asciiTiers, true, ASCII_GLYPHS).render(width)[0];
+	assert.equal(termVisWidth(line), width, `ascii truncation must fit width ${width}`);
+	assert.equal([...stripAnsi(line)].every((c) => c.charCodeAt(0) < 128), true, `ascii truncation stays ascii at ${width}`);
+}
+
 // Unicode mode keeps the glyphs (regression guard for the default path)
 assert.ok(buildAccountTiers(acc({ balance: 10 }), true)[0].includes("\u26A0 \u25C6"));
 
 // Truncation takes the caller's ellipsis so ASCII mode stays ASCII
-assert.equal(truncateAnsi("abcdefghij", 5, "..."), "abcd...");
+// The ellipsis is billed its own width: ASCII "..." (3 cells) leaves 2 for text
+assert.equal(truncateAnsi("abcdefghij", 5, "..."), "ab...");
+assert.equal(termVisWidth(truncateAnsi("abcdefghij", 5, "...")), 5);
+// An ellipsis wider than the whole budget is itself cut to it
+assert.equal(truncateAnsi("abcdefghij", 2, "..."), "..");
+assert.equal(truncateAnsi("abcdefghij", 1, "..."), ".");
 assert.ok(truncateAnsi("abcdefghij", 5).endsWith("\u2026"));
 
 assert.equal(coerceStatusConfig({ glyphs: "bogus" }).glyphs, "auto");

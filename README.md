@@ -186,12 +186,13 @@ Non-interactive toggles:
 
 `glyphs: "auto"` replaces the footer glyphs (bolt, gem, warning, auth arrow,
 separator) with ASCII equivalents on legacy terminals (mintty/Cygwin), whose
-cell-width tables disagree with the extension's width math. There a
-full-width widget line can wrap physically, which desynchronizes pi's
-renderer and leaves stale rows behind. The widget also never paints the
-terminal's last column, and clamps an explicit `unicode` choice to ASCII on
-legacy terminals; the statusbar is not edge-padded and always honors the
-exact choice.
+cell-width tables disagree with the extension's width math. There a glyph the
+terminal renders wider than the extension measures overflows the widget line,
+which desynchronizes pi's renderer and leaves stale rows behind. The widget
+also right-aligns the account side flush with the terminal's last column, the
+way pi's built-in footer does, and clamps an explicit `unicode` choice to
+ASCII on legacy terminals; the statusbar is not edge-padded and always honors
+the exact choice.
 
 
 ## Authentication

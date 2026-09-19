@@ -77,10 +77,11 @@
  *
  *   - glyphs "auto" swaps the emoji footer glyphs for ASCII on legacy
  *     terminals (mintty/Cygwin), whose cell-width tables disagree with the
- *     width math and wrap the full-width widget line. "unicode"/"ascii"
- *     force a set. The widget never paints the terminal's last column, and
- *     clamps an explicit "unicode" to ASCII on legacy terminals; the
- *     statusbar is not edge-padded and honors the exact choice.
+ *     width math and can overflow the widget line. "unicode"/"ascii"
+ *     force a set. The widget right-aligns the account side flush with the
+ *     terminal's last column (as pi's built-in footer does) and clamps an
+ *     explicit "unicode" to ASCII on legacy terminals; the statusbar is
+ *     not edge-padded and honors the exact choice.
  *     /hypercharm-status refresh          (re-fetch balance/team now)
  *     /hypercharm-status reset
  *
