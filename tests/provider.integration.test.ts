@@ -144,7 +144,12 @@ async function load(options = {}) {
 		noThemes: true,
 		noContextFiles: true,
 	});
-	await loader.reload();
+	// Pin only catalog loading, not timeout clocks or subsequent provider work.
+	const now = Date.now;
+	try {
+		if (options.catalogNow !== undefined) Date.now = () => options.catalogNow;
+		await loader.reload();
+	} finally { Date.now = now; }
 	assert.deepEqual(loader.getExtensions().errors, [], "extension must load without errors");
 
 	const sessionManager = options.sessionFile
@@ -163,7 +168,10 @@ async function load(options = {}) {
 	// the extension session path is part of what this suite verifies.
 	const runner = session.extensionRunner;
 	await runner.emit({ type: "session_start", reason: "startup" });
-	return { credentials, runtime, loader, session, sessionManager, runner };
+	return { credentials, runtime, loader, session, sessionManager, runner, async shutdown() {
+		try { await runner.emit({ type: "session_shutdown", reason: "quit" }); }
+		finally { session.dispose(); }
+	} };
 }
 
 function assistantMessage(overrides = {}) {
@@ -191,7 +199,9 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 	const stderr = captureStderr();
 	let harness;
 	try {
-		harness = await load();
+		const graveyard = Object.values(JSON.parse(readFileSync(deprecatedModelsPath, "utf8")));
+		const graceNow = Math.max(...graveyard.map(entry => Date.parse(entry.deprecatedAt))) + 24 * 60 * 60 * 1000;
+		harness = await load({ catalogNow: graceNow });
 
 		const embedded = harness.runtime.getModel("hypercharm", "deepseek-v4-flash");
 		assert.ok(embedded, "embedded catalog must register without any network");
@@ -210,8 +220,8 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 			).map((model) => model.id),
 		);
 		const deprecatedOnly = Object.values(deprecated).filter((entry) => !embeddedIds.has(entry.id));
-		const fresh = deprecatedOnly.filter((entry) => Date.now() - Date.parse(entry.deprecatedAt) <= DEPRECATED_TTL_MS);
-		const stale = deprecatedOnly.filter((entry) => Date.now() - Date.parse(entry.deprecatedAt) > DEPRECATED_TTL_MS);
+		const fresh = deprecatedOnly.filter((entry) => graceNow - Date.parse(entry.deprecatedAt) <= DEPRECATED_TTL_MS);
+		const stale = deprecatedOnly.filter((entry) => graceNow - Date.parse(entry.deprecatedAt) > DEPRECATED_TTL_MS);
 		assert.ok(fresh.length > 0, "expected at least one model inside the deprecated grace window");
 		for (const entry of fresh) {
 			assert.ok(harness.runtime.getModel("hypercharm", entry.id), entry.id + " must be served during its grace period");
@@ -235,7 +245,7 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		assert.match(warning, /network disabled/);
 	} finally {
 		stderr.restore();
-		harness?.session.dispose();
+		await harness?.shutdown();
 	}
 });
 
@@ -268,7 +278,7 @@ test("refreshes from /v1/provider, caches the catalog, and retains it when refre
 		assert.ok(Array.isArray(cached), "catalog cache written as an array");
 		assert.ok(cached.some((entry) => entry.id === "fixture-model"), "cache holds the refreshed catalog");
 	} finally {
-		first.session.dispose();
+		await first.shutdown();
 	}
 
 	// A later session keeps serving the cached catalog even though Hyper is down.
@@ -280,7 +290,7 @@ test("refreshes from /v1/provider, caches the catalog, and retains it when refre
 		assert.match(warning, /model catalog/);
 	} finally {
 		stderr.restore();
-		second.session.dispose();
+		await second.shutdown();
 	}
 });
 
@@ -368,7 +378,7 @@ test("records prism routing as durable session entries", async () => {
 		// renderer registration both survive.
 		const sessionFile = sessionManager.getSessionFile();
 		assert.ok(sessionFile);
-		harness.session.dispose();
+		await harness.shutdown();
 		disposed = true;
 
 		const restored = await load({ sessionFile });
@@ -389,10 +399,10 @@ test("records prism routing as durable session entries", async () => {
 			assert.ok(restoredComponent);
 			assert.ok(restoredComponent.render(80).join("\n").includes("Prism \u2192 GLM 5.3 Flash"));
 		} finally {
-			restored.session.dispose();
+			await restored.shutdown();
 		}
 	} finally {
-		if (!disposed) harness.session.dispose();
+		if (!disposed) await harness.shutdown();
 	}
 });
 
@@ -428,7 +438,7 @@ test("co-installs with the official identifier surface without interference", as
 		}
 		assert.equal(ui.statusKeys.includes("hyper") && ownKeys.includes("hyper"), false);
 	} finally {
-		harness.session.dispose();
+		await harness.shutdown();
 	}
 });
 
@@ -480,6 +490,6 @@ test("shows the footer widget on model selection and clears it when the provider
 			"no reinstall while another provider's model is active",
 		);
 	} finally {
-		harness.session.dispose();
+		await harness.shutdown();
 	}
 });
