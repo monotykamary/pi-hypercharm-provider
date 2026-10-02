@@ -20,7 +20,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 ## Features
 
-- **34+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **23+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -36,29 +36,18 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 | DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.44 | $1.32 |
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
 | DeepSeek V4 Pro 0813 | Text | 1.0M | 262K | $1.44 | $4.31 |
-| DeepSeek V4.1 Flash | Text + Image | 1.0M | 33K | $0.30 | $1.20 |
+| DeepSeek V4.1 Flash | Text + Image | 1.0M | 262K | $0.33 | $1.31 |
 | Gemma 4 26B A4B | Text | 256K | 26K | $0.10 | $0.33 |
 | GLM 5.3 | Text | 1.0M | 128K | $1.52 | $4.79 |
 | GLM 5.3 Flash | Text + Image | 1.0M | 131K | $0.16 | $0.54 |
-| GLM-5 | Text | 203K | 20K | $0.86 | $2.75 |
-| GLM-5.1 | Text | 203K | 3K | $1.36 | $4.27 |
 | GLM-5.2 | Text | 1.0M | 33K | $1.52 | $4.79 |
 | gpt-oss-120b | Text | 131K | 13K | $0.18 | $0.68 |
 | Inkling | Text + Image | 1.0M | 66K | $1.09 | $4.41 |
 | Kimi K2 Thinking | Text | 262K | 26K | $0.60 | $2.50 |
-| Kimi K2.5 | Text | 262K | 26K | $0.56 | $2.94 |
-| Kimi K2.6 | Text + Image | 262K | 26K | $1.03 | $4.36 |
 | Kimi K2.7 Code | Text + Image | 256K | 16K | $1.03 | $4.36 |
 | Kimi K3 | Text + Image | 1.0M | 16K | $3.27 | $16.33 |
-| Llama 3.3 70B Instruct | Text | 128K | 13K | $0.61 | $1.04 |
-| Llama 4 Maverick 17B 128E Instruct FP8 | Text | 430K | 43K | $0.25 | $0.83 |
 | MiniMax M2.7 | Text | 262K | 7K | $0.48 | $1.85 |
 | MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
-| Qwen3 Coder 480B A35B Instruct INT4 Mixed AR | Text | 106K | 11K | $0.45 | $2.15 |
-| Qwen3 Next 80B A3B Instruct | Text | 262K | 26K | $0.12 | $1.14 |
-| Qwen3.6-Flash | Text + Image | 1.0M | 64K | $1.00 | $4.00 |
-| Qwen3.6-Max | Text | 256K | 64K | $2.00 | $12.00 |
-| Qwen3.6-Plus | Text + Image | 1.0M | 64K | $2.00 | $6.00 |
 | Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
 | Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
 | Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
