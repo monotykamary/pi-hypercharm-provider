@@ -9,7 +9,7 @@
  * official provider's identifier surface (tests/fixtures/official-surface.ts).
  */
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, test } from "node:test";
@@ -22,7 +22,6 @@ delete process.env.HYPERCHARM_API_KEY;
 
 const extensionPath = fileURLToPath(new URL("../index.ts", import.meta.url));
 const officialSurfacePath = fileURLToPath(new URL("./fixtures/official-surface.ts", import.meta.url));
-const deprecatedModelsPath = fileURLToPath(new URL("../deprecated-models.json", import.meta.url));
 const embeddedModelsPath = fileURLToPath(new URL("../models.json", import.meta.url));
 
 const EMBEDDED_AUTHORITY_NOTE = "tests must run against the embedded catalog";
@@ -199,9 +198,22 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 	const stderr = captureStderr();
 	let harness;
 	try {
-		const graveyard = Object.values(JSON.parse(readFileSync(deprecatedModelsPath, "utf8")));
-		const graceNow = Math.max(...graveyard.map(entry => Date.parse(entry.deprecatedAt))) + 24 * 60 * 60 * 1000;
-		harness = await load({ catalogNow: graceNow });
+		// The generated graveyard may be empty. Exercise the actual extension
+		// against deterministic data in an isolated copy, never edit generated files.
+		const fixtureDir = mkdtempSync(path.join(agentDir, "grace-fixture-"));
+		const sourceDir = path.dirname(extensionPath);
+		for (const file of readdirSync(sourceDir)) {
+			if (/\.(ts|json)$/.test(file)) copyFileSync(path.join(sourceDir, file), path.join(fixtureDir, file));
+		}
+		const graceNow = Date.UTC(2026, 0, 15);
+		const base = JSON.parse(readFileSync(embeddedModelsPath, "utf8"))[0];
+		const deprecated = {
+			fresh: { ...base, id: "fixture-grace-fresh", deprecatedAt: new Date(graceNow - DEPRECATED_TTL_MS).toISOString() },
+			stale: { ...base, id: "fixture-grace-stale", deprecatedAt: new Date(graceNow - DEPRECATED_TTL_MS - 1).toISOString() },
+			invalid: { ...base, id: "fixture-grace-invalid", deprecatedAt: "invalid" },
+		};
+		writeFileSync(path.join(fixtureDir, "deprecated-models.json"), JSON.stringify(deprecated));
+		harness = await load({ catalogNow: graceNow, extensionPaths: [path.join(fixtureDir, "index.ts")] });
 
 		const embedded = harness.runtime.getModel("hypercharm", "deepseek-v4-flash");
 		assert.ok(embedded, "embedded catalog must register without any network");
@@ -211,8 +223,7 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		assert.equal(EMBEDDED_AUTHORITY_NOTE, "tests must run against the embedded catalog");
 
 		// Deprecated grace: entries inside the 14-day TTL are still served,
-		// entries past it are evicted. Derived from the data, not today's date.
-		const deprecated = JSON.parse(readFileSync(deprecatedModelsPath, "utf8"));
+		// entries past it are evicted, including the exact TTL + 1ms boundary.
 		const embeddedIds = new Set(
 			(Array.isArray(JSON.parse(readFileSync(embeddedModelsPath, "utf8")))
 				? JSON.parse(readFileSync(embeddedModelsPath, "utf8"))
@@ -222,7 +233,9 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		const deprecatedOnly = Object.values(deprecated).filter((entry) => !embeddedIds.has(entry.id));
 		const fresh = deprecatedOnly.filter((entry) => graceNow - Date.parse(entry.deprecatedAt) <= DEPRECATED_TTL_MS);
 		const stale = deprecatedOnly.filter((entry) => graceNow - Date.parse(entry.deprecatedAt) > DEPRECATED_TTL_MS);
-		assert.ok(fresh.length > 0, "expected at least one model inside the deprecated grace window");
+		assert.equal(fresh.length, 1, "exact TTL boundary is still served");
+		assert.equal(stale.length, 1, "TTL + 1ms is expired");
+		assert.equal(harness.runtime.getModel("hypercharm", deprecated.invalid.id), undefined, "invalid deprecation timestamps are evicted");
 		for (const entry of fresh) {
 			assert.ok(harness.runtime.getModel("hypercharm", entry.id), entry.id + " must be served during its grace period");
 		}
