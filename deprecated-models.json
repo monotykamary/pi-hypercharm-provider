@@ -1,1 +1,66 @@
-{}
+{
+  "deepseek-v4-flash": {
+    "id": "deepseek-v4-flash",
+    "name": "DeepSeek V4 Flash",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": null,
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "xhigh",
+      "max": null
+    },
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0.2,
+      "output": 0.4,
+      "cacheRead": 0.04,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    },
+    "deprecatedAt": "2026-10-10T00:00:09.617Z"
+  },
+  "deepseek-v4-pro": {
+    "id": "deepseek-v4-pro",
+    "name": "DeepSeek V4 Pro",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": null,
+      "minimal": null,
+      "low": null,
+      "medium": null,
+      "high": "high",
+      "xhigh": "xhigh",
+      "max": null
+    },
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 2.4,
+      "output": 4.8,
+      "cacheRead": 0.2,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    },
+    "deprecatedAt": "2026-10-10T00:00:09.617Z"
+  }
+}
