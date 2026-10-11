@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.3.41
 
 - `/login` while the session-start catalog revalidation is still in flight now fetches the new account's catalog right away: the forced refresh aborts the old-credential revalidation and waits for it to release the sync lock instead of skipping as "locked" until the next session start.
 
