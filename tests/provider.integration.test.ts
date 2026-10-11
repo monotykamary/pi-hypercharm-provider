@@ -19,6 +19,9 @@ const agentDir = mkdtempSync(path.join(tmpdir(), "pi-hypercharm-test-"));
 process.env.PI_CODING_AGENT_DIR = agentDir;
 delete process.env.PI_OFFLINE;
 delete process.env.HYPERCHARM_API_KEY;
+// Every load() here models a fresh pi process that must revalidate the catalog;
+// 0 disables the quiet-startup-sync TTL and failure backoff (sync-policy.ts).
+process.env.PI_PROVIDER_SYNC_TTL_MS = "0";
 
 const extensionPath = fileURLToPath(new URL("../index.ts", import.meta.url));
 const officialSurfacePath = fileURLToPath(new URL("./fixtures/official-surface.ts", import.meta.url));

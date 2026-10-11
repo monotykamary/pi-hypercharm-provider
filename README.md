@@ -24,7 +24,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
-- **Official Catalog Sync** from Charm's typed `/v1/provider` endpoint, matching `@charmland/pi-hyper-provider`
+- **Official Catalog Sync** from Charm's typed `/v1/provider` endpoint, matching `@charmland/pi-hyper-provider` — refreshed quietly in the background, at most hourly and by one pi process at a time ([details](#model-sync))
 - **Reasoning Models** with provider-published on/off states and exact effort levels
 - **Attachment Support** for models the official catalog marks as attachment-capable
 
@@ -138,7 +138,11 @@ renders when the session-start or model-select credits fetch lands, and the
 session side joins it after the first HyperCharm turn completes. Selecting
 another provider hides it (`hideOnOtherProvider` defaults to `true`), the
 balance refreshes when the agent run fully settles, and sessions that never
-use HyperCharm make no status-related API calls:
+use HyperCharm make no status-related API calls. The session-start prefetch
+runs only in interactive sessions (never in `pi -p` or child agents) and is
+shared across pi processes: one process polls and writes
+`~/.pi/agent/cache/hypercharm-account.json`, and sessions started within the
+next 2 minutes render that snapshot instead of polling again:
 
 ```
 ⚡ 1.24 hc · 7 req                       Xu's Team ◆ 249 hc · 996/1k/h · 29d
@@ -209,6 +213,7 @@ Get your API key from [hyper.charm.land](https://hyper.charm.land).
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `HYPERCHARM_API_KEY` | No | Your Charm Hyper API key (fallback if not in auth.json) |
+| `PI_PROVIDER_SYNC_TTL_MS` | No | Model sync freshness window in ms (default `3600000`; `0` = revalidate every session start) |
 
 ## Configuration
 
@@ -245,6 +250,25 @@ Model metadata matches Charm's official [`@charmland/pi-hyper-provider`](https:/
 | `deepseek-v4.1-flash` | `thinkingLevelMap.max = "max"` | The catalog publishes `low,high,xhigh`; `max` mirrors the sibling DeepSeek V4 entries. |
 
 Each entry carries the model's full level map, because `patch.json` replaces `thinkingLevelMap` wholesale rather than merging it.
+
+## Model sync
+
+Startup never waits on the network. pi starts with the cached catalog (`~/.pi/agent/cache/hypercharm-models.json`,
+falling back to the bundled `models.json`) and revalidates against `/v1/provider` in the background — only when:
+
+- HyperCharm credentials are configured (no credentials, no request),
+- the cache is older than 1 hour, missing, or was fetched with different credentials, and
+- no other pi process is already refreshing it (a `hypercharm-models.lock` file next to the cache).
+
+So `/new`, `/reload`, `pi -p` and fan-out child agents share one cache instead of each calling the API; a
+session that skips the fetch still picks up a cache another process refreshed. A failed refresh is retried after
+5 minutes at the earliest. `PI_PROVIDER_SYNC_TTL_MS` changes the window (`0` revalidates on every session start).
+Only a hash fingerprint of the credential is stored (`hypercharm-models.sync.json`), never the credential itself.
+For OAuth the fingerprint follows the stored refresh token rather than the short-lived access token, so routine
+token refreshes do not trigger a refetch, while a completed `/login` always forces one.
+
+The footer's session-start account prefetch uses the same policy with its own cache
+(`hypercharm-account.json`, 2-minute window), and only in interactive sessions.
 
 ## Updating Models
 

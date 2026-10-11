@@ -12,7 +12,12 @@
  *
  * Model resolution strategy: Stale-While-Revalidate
  *   1. Serve stale immediately: disk cache → embedded models.json (zero-latency)
- *   2. Revalidate in background: live API /v1/models → merge with embedded → cache → hot-swap
+ *   2. Revalidate in background: live API /v1/provider → merge with embedded → cache → hot-swap
+ *      Quiet startup sync (sync-policy.ts): only with credentials, only when the
+ *      disk cache is older than the TTL (1h, PI_PROVIDER_SYNC_TTL_MS), missing,
+ *      or fetched under another credential identity (OAuth: the stored refresh
+ *      token, since access tokens rotate), and only one pi process at a time
+ *      (lock file next to the cache). A completed /login forces a revalidation.
  *   3. patch.json + custom-models.json applied on top of whichever source won
  *
  * Merge order: [live|cache|embedded] → apply patch.json → merge custom-models.json
@@ -40,7 +45,11 @@
  *   everything the moment the active model belongs to another provider.
  *   Credits/team are prefetched on session start or model select when a
  *   HyperCharm model is active, so the first turn ends with data already
- *   cached. The balance is polled again on pi's agent_settled event (fires
+ *   cached. The session-start prefetch runs only with a UI (never in print
+ *   mode or child agents) and is shared across pi processes: the result is
+ *   written to cache/hypercharm-account.json and processes that start within
+ *   ACCOUNT_SYNC_TTL_MS (2 min) of it render that snapshot instead of
+ *   polling (same lock/fingerprint policy as the model sync). The balance is polled again on pi's agent_settled event (fires
  *   only once no automatic retry,
  *   compaction, or queued continuation can follow) — and nowhere else, so
  *   sessions without HyperCharm turns make zero status-related API calls.
@@ -107,9 +116,11 @@
 
 import { clampThinkingLevel, streamOpenAICompletions } from "@earendil-works/pi-ai/compat";
 import type { AssistantMessageEventStream, SimpleStreamOptions } from "@earendil-works/pi-ai/compat";
+import type { OAuthCredentials } from "@earendil-works/pi-ai";
 import { Text } from "@earendil-works/pi-tui";
 import { USER_AGENT, loginHypercharm, refreshHypercharmToken } from "./oauth";
 import {
+	ACCOUNT_CACHE_FILE_NAME,
 	API_KEY_PLACEHOLDER,
 	API_NAME,
 	CACHE_FILE_NAME,
@@ -149,6 +160,14 @@ import {
 import fs from "fs";
 import { hostname } from "os";
 import path from "path";
+import {
+	acquireModelSync,
+	cacheChangedSinceLoad,
+	keyFingerprint,
+	markCacheLoaded,
+	syncMetaPath,
+	writeFileAtomic,
+} from "./sync-policy";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -388,7 +407,8 @@ function loadCachedModels(): JsonModel[] | null {
 function cacheModels(models: JsonModel[]): void {
 	try {
 		fs.mkdirSync(CACHE_DIR, { recursive: true });
-		fs.writeFileSync(CACHE_PATH, JSON.stringify(models, null, 2) + "\n");
+		// Atomic (tmp + rename): other pi processes may be reading the cache right now.
+		writeFileAtomic(CACHE_PATH, JSON.stringify(models, null, 2) + "\n");
 	} catch (err) {
 		// Non-fatal: the freshly fetched catalog still serves this session.
 		notifier.warn(`Could not write the HyperCharm model cache to ${CACHE_PATH}: ${describeError(err)}.`);
@@ -455,6 +475,7 @@ function withDeprecated(models: JsonModel[]): JsonModel[] {
 }
 
 function loadStaleModels(embeddedModels: JsonModel[]): JsonModel[] {
+	markCacheLoaded(CACHE_PATH); // stat before read: lets session_start spot newer caches
 	const cached = loadCachedModels();
 	if (!cached || cached.length === 0) return embeddedModels;
 
@@ -468,23 +489,76 @@ function loadStaleModels(embeddedModels: JsonModel[]): JsonModel[] {
 	return cached;
 }
 
-async function revalidateModels(apiKey: string | undefined, embeddedModels: JsonModel[], signal?: AbortSignal): Promise<JsonModel[] | null> {
-	if (!apiKey) return null;
-	const liveModels = await fetchLiveModels(apiKey, signal);
-	if (!liveModels || liveModels.length === 0) return null;
-	const merged = mergeWithEmbedded(liveModels, embeddedModels);
-	cacheModels(merged);
-	return merged;
+/**
+ * Background revalidation, gated by the quiet startup sync policy
+ * (sync-policy.ts): no credentials → no fetch; fresh cache (TTL) → no fetch;
+ * another process already fetching → no fetch. When skipped, a cache that
+ * another process refreshed since we loaded it is adopted from disk instead.
+ * `force` bypasses the TTL (e.g. after /login); it is still single-flight.
+ *
+ * `identity` is the stable credential identity used only for presence and the
+ * fingerprint (see credentialIdentity); `apiKey` is the bearer token we fetch with.
+ */
+async function revalidateModels(
+	apiKey: string | undefined,
+	identity: string | undefined,
+	embeddedModels: JsonModel[],
+	signal?: AbortSignal,
+	force = false,
+): Promise<JsonModel[] | null> {
+	const lease = acquireModelSync({ cachePath: CACHE_PATH, apiKey: apiKey ? identity : undefined, force });
+	if (!lease) return cacheChangedSinceLoad(CACHE_PATH) ? loadStaleModels(embeddedModels) : null;
+	let merged: JsonModel[] | null = null;
+	try {
+		const liveModels = apiKey ? await fetchLiveModels(apiKey, signal) : null;
+		if (!liveModels || liveModels.length === 0) return null;
+		merged = mergeWithEmbedded(liveModels, embeddedModels);
+		cacheModels(merged);
+		return merged;
+	} finally {
+		lease.release(merged ? "fetched" : signal?.aborted ? "aborted" : "failed");
+	}
 }
 
 // ─── API Key Resolution (via ModelRegistry) ────────────────────────────────────
 
 let cachedApiKey: string | undefined;
+// Stable identity behind cachedApiKey for the quiet-sync fingerprints.
+let cachedSyncIdentity: string | undefined;
 let revalidateAbort: AbortController | null = null;
+
+const AUTH_PATH = path.join(getAgentDir(), "auth.json");
+
+const oauthIdentity = (refresh: string): string => `oauth:${refresh}`;
+
+/**
+ * Stable credential identity for the quiet-sync fingerprint. OAuth access
+ * tokens rotate on every token refresh, so fingerprinting the resolved key
+ * would look like an account change each time. For an OAuth entry in
+ * auth.json use its refresh token instead (it changes on /login); API keys —
+ * auth.json, --api-key, HYPERCHARM_API_KEY — are static, so use the key itself.
+ * Only ever hashed (sync-policy keyFingerprint), never stored.
+ */
+function credentialIdentity(apiKey: string | undefined): string | undefined {
+	if (!apiKey) return undefined;
+	try {
+		const stored = JSON.parse(fs.readFileSync(AUTH_PATH, "utf8"))?.[PROVIDER_ID];
+		if (stored?.type === "oauth" && typeof stored.refresh === "string" && stored.refresh) {
+			return oauthIdentity(stored.refresh);
+		}
+	} catch {
+		// No/unreadable auth.json: the key resolved from elsewhere (env, --api-key).
+	}
+	return apiKey;
+}
 
 async function resolveApiKey(modelRegistry: ModelRegistry): Promise<void> {
 	cachedApiKey = await modelRegistry.getApiKeyForProvider(PROVIDER_ID) ?? undefined;
+	cachedSyncIdentity = credentialIdentity(cachedApiKey);
 }
+
+// Set by the extension entry point: runs after a /login completes.
+let onLoginComplete: ((credentials: OAuthCredentials) => void) | null = null;
 
 // ─── Status Display Configuration ──────────────────────────────────────────────
 
@@ -698,6 +772,12 @@ let statusEpoch = 0;
 let lastCreditsFetchAt = 0;
 let creditsInFlight: Promise<void> | null = null;
 let metaFetched = false;
+// Bumped on every successful /v1/credits read (lets the startup sync tell a
+// fresh balance from one adopted off disk).
+let creditsOkCount = 0;
+// Absolute OAuth device-session expiry behind account.authDaysLeft (persisted
+// in the account snapshot so other processes recompute days-left correctly).
+let authExpiresAtMs: number | null = null;
 
 async function fetchJsonGet(url: string, apiKey: string, signal: AbortSignal | undefined, label: string): Promise<any | null> {
 	try {
@@ -735,6 +815,7 @@ function refreshCredits(apiKey: string | undefined, signal: AbortSignal | undefi
 			const rawBalance = typeof data?.balance === "number" ? data.balance : typeof data?.balance_usd === "number" ? data.balance_usd * 20 : undefined;
 			if (typeof rawBalance === "number" && Number.isFinite(rawBalance)) {
 				account.balance = rawBalance;
+				creditsOkCount += 1;
 			}
 		} finally {
 			creditsInFlight = null;
@@ -764,11 +845,102 @@ async function refreshAccountMeta(apiKey: string | undefined, signal?: AbortSign
 		const own = devices.items.find((d: any) => typeof d?.name === "string" && d.name === `Pi (${hostname()})`);
 		const expMs = own ? Date.parse(own.expires_at ?? "") : NaN;
 		if (!Number.isNaN(expMs)) {
-			account.authDaysLeft = Math.max(0, Math.ceil((expMs - Date.now()) / 86_400_000));
+			authExpiresAtMs = expMs;
+			account.authDaysLeft = daysUntil(expMs);
 		}
 	}
 
 	if (account.teamName !== null || account.authDaysLeft !== null) metaFetched = true;
+}
+
+function daysUntil(ms: number): number {
+	return Math.max(0, Math.ceil((ms - Date.now()) / 86_400_000));
+}
+
+// ─── Quiet Startup Account Sync ──────────────────────────────────────────────
+// Every pi process with a UI used to poll /v1/credits + /v1/teams + /v1/devices
+// on session_start. The startup prefetch now goes through the same
+// cross-process policy as the model sync (sync-policy.ts), with its own cache:
+// one process polls and writes cache/hypercharm-account.json, every other
+// process starting within ACCOUNT_SYNC_TTL_MS renders that snapshot from disk.
+// Turn-triggered polls (model_select, agent_settled, 402, /hypercharm-status
+// refresh) are unchanged and stay throttled per process.
+
+const ACCOUNT_CACHE_PATH = path.join(CACHE_DIR, ACCOUNT_CACHE_FILE_NAME);
+/**
+ * Freshness window for the shared startup account snapshot. 2 minutes: long
+ * enough to collapse /new, /reload and fan-out bursts into one poll, short
+ * enough that a session started later shows a current balance. The balance
+ * also moves optimistically per turn and agent_settled reconciles it.
+ */
+const ACCOUNT_SYNC_TTL_MS = 2 * 60 * 1000;
+
+interface AccountSnapshot {
+	version: 1;
+	balance: number | null;
+	teamName: string | null;
+	authExpiresAt: number | null;
+}
+
+/** Render a snapshot another process wrote, if it belongs to the same credential identity. */
+function adoptAccountSnapshot(identity: string): void {
+	try {
+		const meta = JSON.parse(fs.readFileSync(syncMetaPath(ACCOUNT_CACHE_PATH), "utf8"));
+		if (meta?.keyFingerprint !== keyFingerprint(identity)) return;
+		const snap = JSON.parse(fs.readFileSync(ACCOUNT_CACHE_PATH, "utf8")) as Partial<AccountSnapshot> | null;
+		if (!snap || typeof snap !== "object") return;
+		if (typeof snap.balance === "number" && Number.isFinite(snap.balance)) account.balance = snap.balance;
+		if (typeof snap.teamName === "string" && snap.teamName.trim()) account.teamName = snap.teamName.trim();
+		if (typeof snap.authExpiresAt === "number" && Number.isFinite(snap.authExpiresAt)) {
+			authExpiresAtMs = snap.authExpiresAt;
+			account.authDaysLeft = daysUntil(snap.authExpiresAt);
+		}
+		if (account.teamName !== null || account.authDaysLeft !== null) metaFetched = true;
+	} catch {
+		// Missing/corrupt snapshot: nothing to adopt.
+	}
+}
+
+function writeAccountSnapshot(): void {
+	const snap: AccountSnapshot = {
+		version: 1,
+		balance: account.balance,
+		teamName: account.teamName,
+		authExpiresAt: authExpiresAtMs,
+	};
+	try {
+		fs.mkdirSync(CACHE_DIR, { recursive: true });
+		writeFileAtomic(ACCOUNT_CACHE_PATH, JSON.stringify(snap) + "\n");
+	} catch {
+		// Non-fatal: other processes just poll themselves.
+	}
+}
+
+/**
+ * Session-start account prefetch: adopt the shared snapshot (synchronously,
+ * before the first await, so the caller can render it at once), then poll only
+ * if this process wins the lease. Callers gate on ctx.hasUI.
+ */
+async function startupAccountSync(apiKey: string | undefined, identity: string | undefined, signal: AbortSignal): Promise<void> {
+	if (!apiKey || !identity) return;
+	adoptAccountSnapshot(identity);
+	const lease = acquireModelSync({
+		cachePath: ACCOUNT_CACHE_PATH,
+		apiKey: identity,
+		ttlMs: ACCOUNT_SYNC_TTL_MS,
+		isValidCache: (d) => d != null,
+	});
+	if (!lease) return;
+	let ok = false;
+	try {
+		const before = creditsOkCount;
+		metaFetched = false;
+		await Promise.all([refreshCredits(apiKey, signal, true), refreshAccountMeta(apiKey, signal)]);
+		ok = !signal.aborted && creditsOkCount > before;
+		if (ok) writeAccountSnapshot();
+	} finally {
+		lease.release(ok ? "fetched" : signal.aborted ? "aborted" : "failed");
+	}
 }
 
 // ─── Status Rendering ─────────────────────────────────────────────────────────
@@ -882,6 +1054,7 @@ function resetStatusState(): void {
 	outOfCreditsNotified = false;
 	lastCreditsFetchAt = 0;
 	metaFetched = false;
+	authExpiresAtMs = null;
 }
 
 /** Commit per-turn pending capture into session state (after tees settle). */
@@ -1117,7 +1290,11 @@ function makeProviderConfig(models: JsonModel[] = currentModels) {
 		streamSimple: streamHypercharm,
 		oauth: {
 			name: PROVIDER_DISPLAY_NAME,
-			login: (callbacks) => loginHypercharm(callbacks),
+			login: async (callbacks) => {
+				const credentials = await loginHypercharm(callbacks);
+				onLoginComplete?.(credentials);
+				return credentials;
+			},
 			refreshToken: (credentials, signal) => refreshHypercharmToken(credentials, signal),
 			getApiKey: (credentials) => String(credentials.access ?? ""),
 		},
@@ -1138,6 +1315,32 @@ export default function (pi: ExtensionAPI) {
 	currentModels = staleModels;
 
 	pi.registerProvider(PROVIDER_ID, makeProviderConfig(staleModels));
+
+	// Revalidate the catalog (quiet startup sync policy) and hot-swap on success.
+	const syncModels = (epoch: number, signal: AbortSignal | undefined, force: boolean): Promise<void> =>
+		revalidateModels(cachedApiKey, cachedSyncIdentity, embeddedModels, signal, force).then((freshBase) => {
+			if (freshBase && epoch === statusEpoch && !signal?.aborted) {
+				currentModels = buildModels(freshBase, customModels, patches);
+				pi.registerProvider(PROVIDER_ID, makeProviderConfig());
+			}
+		});
+
+	// A completed /login means new credentials: adopt them and force a
+	// revalidation (still single-flight). Deferred so pi persists the
+	// credential first; never blocks or fails the login itself.
+	onLoginComplete = (credentials) => {
+		const access = String(credentials.access ?? "");
+		if (!access) return;
+		cachedApiKey = access;
+		cachedSyncIdentity = typeof credentials.refresh === "string" && credentials.refresh ? oauthIdentity(credentials.refresh) : access;
+		// New account: team/device metadata and the throttle start over.
+		metaFetched = false;
+		lastCreditsFetchAt = 0;
+		const epoch = statusEpoch;
+		setTimeout(() => {
+			void syncModels(epoch, revalidateAbort?.signal, true).catch(() => {});
+		}, 0);
+	};
 
 	pi.registerCommand(STATUS_COMMAND, {
 		description: "Configure the HyperCharm footer status (session spend, balance, rate limits)",
@@ -1163,31 +1366,29 @@ export default function (pi: ExtensionAPI) {
 		// over anything that touched provider registration during load.
 		pi.registerProvider(PROVIDER_ID, makeProviderConfig());
 
-		// A failure here used to vanish: no key resolved meant no refresh and no
-		// diagnostics. Surface it, then continue — without a key we serve the
-		// embedded/cached catalog.
-		resolveApiKey(ctx.modelRegistry)
+		// Fire-and-forget: never await network here — startup must not block on
+		// the provider API. Nothing is awaited and every rejection is swallowed.
+		// A key-resolution failure is surfaced (it used to vanish), then we keep
+		// serving the embedded/cached catalog.
+		void resolveApiKey(ctx.modelRegistry)
 			.catch((err) => {
 				notifier.warn(`Unable to resolve HyperCharm credentials: ${describeError(err)} — serving cached/embedded models.`);
 			})
 			.then(() => {
-			// A session replacement while the key resolved invalidated the
-			// captured ctx (fast-resume, /new, /fork); nothing below may touch it.
-			if (epoch !== statusEpoch) return;
-			// Prefetch credits/team metadata only when a HyperCharm model is active
-			// (pi-neuralwatt also prefetches so the first turn ends with data, but
-			// gating here avoids API calls in sessions that never use the provider).
-			if (currentProviderId(ctx) === PROVIDER_ID) {
-				updateStatusAfter(refreshCredits(cachedApiKey, statusSignal, true), ctx);
-				updateStatusAfter(refreshAccountMeta(cachedApiKey, statusSignal), ctx);
-			}
-			revalidateModels(cachedApiKey, embeddedModels, signal).then((freshBase) => {
-				if (freshBase && epoch === statusEpoch && !signal.aborted) {
-					currentModels = buildModels(freshBase, customModels, patches);
-					pi.registerProvider(PROVIDER_ID, makeProviderConfig());
+				// A session replacement while the key resolved invalidated the
+				// captured ctx (fast-resume, /new, /fork); nothing below may touch it.
+				if (epoch !== statusEpoch) return;
+				// Prefetch credits/team metadata only when a HyperCharm model is
+				// active and there is a UI to show it (print mode and child agents
+				// never render the footer), deduped across pi processes.
+				if (ctx.hasUI && currentProviderId(ctx) === PROVIDER_ID) {
+					const accountSync = startupAccountSync(cachedApiKey, cachedSyncIdentity, statusSignal);
+					updateStatus(ctx); // renders an adopted snapshot right away
+					updateStatusAfter(accountSync.catch(() => {}), ctx);
 				}
-			});
-		});
+				return syncModels(epoch, signal, false);
+			})
+			.catch(() => { /* keep serving the stale catalog */ });
 	});
 
 	pi.on("model_select", (event, ctx) => {

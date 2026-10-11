@@ -27,6 +27,8 @@ export const PRISM_ENTRY_TYPE = `${PROVIDER_ID}-prism-route`;
 
 export const CONFIG_FILE_NAME = `${PROVIDER_ID}.json`;
 export const CACHE_FILE_NAME = `${PROVIDER_ID}-models.json`;
+/** Cross-process account snapshot (balance/team/device expiry) shared by quiet startup sync. */
+export const ACCOUNT_CACHE_FILE_NAME = `${PROVIDER_ID}-account.json`;
 
 /**
  * Every distinct namespaced identifier this extension registers or writes.
@@ -45,5 +47,6 @@ export const IDENTIFIERS: readonly string[] = Object.freeze([
 		PRISM_ENTRY_TYPE,
 		CONFIG_FILE_NAME,
 		CACHE_FILE_NAME,
+		ACCOUNT_CACHE_FILE_NAME,
 	]),
 ]);

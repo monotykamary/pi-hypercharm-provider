@@ -9,7 +9,7 @@
     "build": "echo 'nothing to build'",
     "check": "tsc --noEmit && npm run smoke && npm test",
     "smoke": "node tests/status.smoke.ts",
-    "test": "node --import jiti/register --test tests/identity.test.ts tests/prism.test.ts tests/notify.test.ts tests/provider.integration.test.ts",
+    "test": "node --import jiti/register --test tests/identity.test.ts tests/prism.test.ts tests/notify.test.ts tests/provider.integration.test.ts && vitest run",
     "update-models": "node scripts/update-models.js",
     "test:pi": "node scripts/test-pi-compat.mjs"
   },
@@ -44,7 +44,8 @@
     "@earendil-works/pi-tui": "1.1.0",
     "@types/node": "^24.10.1",
     "jiti": "2.7.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "4.1.7"
   },
   "author": "",
   "license": "MIT",
