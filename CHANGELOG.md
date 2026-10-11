@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.3.40
 
 - Quiet startup sync: background `/v1/provider` revalidation runs only with credentials, only when the disk cache is older than 1 hour (`PI_PROVIDER_SYNC_TTL_MS`, `0` = always), missing, or fetched with different credentials, and only in one pi process at a time (lock file next to the cache). Failed refreshes back off for 5 minutes; sessions that skip adopt a cache refreshed by another process. A completed `/login` forces a revalidation.
 - OAuth sessions are fingerprinted by the stored refresh token (not the rotating access token), so token refreshes don't trigger refetches. Only a salted sha256 fingerprint is stored (`cache/hypercharm-models.sync.json`); the cache file format is unchanged.
