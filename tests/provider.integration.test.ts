@@ -218,11 +218,11 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		writeFileSync(path.join(fixtureDir, "deprecated-models.json"), JSON.stringify(deprecated));
 		harness = await load({ catalogNow: graceNow, extensionPaths: [path.join(fixtureDir, "index.ts")] });
 
-		const embedded = harness.runtime.getModel("hypercharm", "deepseek-v4-flash");
+		const embedded = harness.runtime.getModel("hypercharm", "deepseek-v4-flash-0731");
 		assert.ok(embedded, "embedded catalog must register without any network");
 		assert.equal(embedded.contextWindow, 1000000);
 		assert.equal(embedded.maxTokens, 384000);
-		assert.equal(embedded.cost.input, 0.2);
+		assert.equal(embedded.cost.input, 0.44);
 		assert.equal(EMBEDDED_AUTHORITY_NOTE, "tests must run against the embedded catalog");
 
 		// Deprecated grace: entries inside the 14-day TTL are still served,
@@ -247,7 +247,7 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		}
 
 		// Namespacing: nothing is registered on the official provider's surfaces.
-		assert.equal(harness.runtime.getModel("hyper", "deepseek-v4-flash"), undefined, "must not register the official provider id");
+		assert.equal(harness.runtime.getModel("hyper", "deepseek-v4-flash-0731"), undefined, "must not register the official provider id");
 		assert.equal(harness.runner.getEntryRenderer("hyper-prism-route"), undefined, "must not register the official entry type");
 		assert.ok(harness.runner.getEntryRenderer(PRISM_ENTRY_TYPE), "prism entry renderer registered");
 		const commandNames = harness.runner.getRegisteredCommands().map((command) => command.name);
@@ -479,8 +479,8 @@ test("shows the footer widget on model selection and clears it when the provider
 		);
 
 		const ui = captureUI(harness.runner);
-		const ours = harness.runtime.getModel("hypercharm", "deepseek-v4-flash");
-		assert.ok(ours, "embedded catalog serves deepseek-v4-flash");
+		const ours = harness.runtime.getModel("hypercharm", "deepseek-v4-flash-0731");
+		assert.ok(ours, "embedded catalog serves deepseek-v4-flash-0731");
 		await harness.session.setModel(ours);
 		// No turn_end is ever emitted in this test: selection alone must install
 		// the widget, with the account side already filled in.
