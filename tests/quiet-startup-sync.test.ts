@@ -363,6 +363,33 @@ describe("HyperCharm quiet sync variants", () => {
     expect(new Headers(fetch.mock.calls[0][1]?.headers).get("Authorization")).toBe("Bearer fresh-access");
   });
 
+  it("fetches the new account's catalog when /login races the session revalidation holding the lock", async () => {
+    setupHome();
+    writeCache(2 * HOUR);
+    vi.doMock("../oauth", () => ({
+      USER_AGENT: "pi-hypercharm-provider/test",
+      loginHypercharm: async () => ({ type: "oauth", refresh: "fresh-refresh", access: "fresh-access", expires: Date.now() + HOUR }),
+      refreshHypercharmToken: async (c: unknown) => c,
+    }));
+    let release!: () => void;
+    const fetch = stubFetch((_url, init) => new Promise<Response>((resolve, reject) => {
+      const signal = init?.signal;
+      signal?.addEventListener("abort", () => reject(signal.reason));
+      release = () => resolve(liveModelsResponse());
+    }));
+    const ext = await loadExtension();
+    await ext.startSession();
+    await vi.waitFor(() => expect(catalogCalls(fetch)).toHaveLength(1)); // session sync in flight, lock held
+
+    await ext.registrations[0].oauth.login({});
+    await vi.waitFor(() => expect(catalogCalls(fetch)).toHaveLength(2));
+    release();
+    await vi.waitFor(() => expect(hasLiveModel(ext.registrations.at(-1))).toBe(true));
+    expect(new Headers(catalogCalls(fetch)[1][1]?.headers).get("Authorization")).toBe("Bearer fresh-access");
+    expect(JSON.parse(fs.readFileSync(syncMetaPath(cachePath), "utf8")).keyFingerprint).toBe(keyFingerprint("oauth:fresh-refresh"));
+    expect(fs.existsSync(syncLockPath(cachePath))).toBe(false);
+  });
+
   it("skips the startup account poll without a UI (print mode, child agents)", async () => {
     setupHome();
     writeCache(10 * 60 * 1000);

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `/login` while the session-start catalog revalidation is still in flight now fetches the new account's catalog right away: the forced refresh aborts the old-credential revalidation and waits for it to release the sync lock instead of skipping as "locked" until the next session start.
+
 ## 1.3.40
 
 - Quiet startup sync: background `/v1/provider` revalidation runs only with credentials, only when the disk cache is older than 1 hour (`PI_PROVIDER_SYNC_TTL_MS`, `0` = always), missing, or fetched with different credentials, and only in one pi process at a time (lock file next to the cache). Failed refreshes back off for 5 minutes; sessions that skip adopt a cache refreshed by another process. A completed `/login` forces a revalidation.

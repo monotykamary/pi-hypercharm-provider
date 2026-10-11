@@ -526,6 +526,8 @@ let cachedApiKey: string | undefined;
 // Stable identity behind cachedApiKey for the quiet-sync fingerprints.
 let cachedSyncIdentity: string | undefined;
 let revalidateAbort: AbortController | null = null;
+// The in-flight catalog revalidation (session start or /login); it never rejects.
+let modelSync: Promise<void> = Promise.resolve();
 
 const AUTH_PATH = path.join(getAgentDir(), "auth.json");
 
@@ -1338,7 +1340,12 @@ export default function (pi: ExtensionAPI) {
 		lastCreditsFetchAt = 0;
 		const epoch = statusEpoch;
 		setTimeout(() => {
-			void syncModels(epoch, revalidateAbort?.signal, true).catch(() => {});
+			// The new credentials supersede an in-flight revalidation, which must
+			// release its sync lock first, or this forced refresh would skip as "locked".
+			revalidateAbort?.abort();
+			revalidateAbort = new AbortController();
+			const signal = revalidateAbort.signal;
+			modelSync = modelSync.then(() => (signal.aborted ? undefined : syncModels(epoch, signal, true))).catch(() => {});
 		}, 0);
 	};
 
@@ -1370,7 +1377,7 @@ export default function (pi: ExtensionAPI) {
 		// the provider API. Nothing is awaited and every rejection is swallowed.
 		// A key-resolution failure is surfaced (it used to vanish), then we keep
 		// serving the embedded/cached catalog.
-		void resolveApiKey(ctx.modelRegistry)
+		modelSync = resolveApiKey(ctx.modelRegistry)
 			.catch((err) => {
 				notifier.warn(`Unable to resolve HyperCharm credentials: ${describeError(err)} — serving cached/embedded models.`);
 			})
