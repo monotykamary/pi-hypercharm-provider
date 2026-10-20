@@ -20,7 +20,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 ## Features
 
-- **24+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **25+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -37,6 +37,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 | DeepSeek V4 Pro | Text | 1.0M | 384K | $2.40 | $4.80 |
 | DeepSeek V4 Pro 0813 | Text | 1.0M | 262K | $1.44 | $4.31 |
 | DeepSeek V4.1 Flash | Text + Image | 1.0M | 262K | $0.33 | $1.31 |
+| DeepSeek V4.1 Flash 1017 | Text + Image | 1.0M | 262K | $0.33 | $1.31 |
 | Gemma 4 26B A4B | Text | 256K | 26K | $0.10 | $0.33 |
 | GLM 5.3 | Text | 1.0M | 128K | $1.52 | $4.79 |
 | GLM 5.3 Flash | Text + Image | 1.0M | 131K | $0.16 | $0.54 |
