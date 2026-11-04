@@ -454,6 +454,38 @@
     }
   },
   {
+    "id": "muse-spark-open",
+    "name": "Muse Spark Open",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": null,
+      "minimal": null,
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
+      "xhigh": "xhigh",
+      "max": null
+    },
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 1.4,
+      "output": 4.65,
+      "cacheRead": 0.17,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1048576,
+    "maxTokens": 1048576,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
     "id": "prism",
     "name": "Prism",
     "reasoning": false,
