@@ -659,8 +659,12 @@ function captureUsage(obj: any): void {
 }
 
 /** Scan a teed response for the final usage chunk (SSE) or JSON body usage. */
-async function readUsageFromTee(body: ReadableStream<Uint8Array>): Promise<void> {
+async function readUsageFromTee(body: ReadableStream<Uint8Array>, signal?: AbortSignal): Promise<void> {
 	const reader = body.getReader();
+	// A tee's cancel promise can wait for the SDK branch; only close our reader.
+	const abort = () => { void reader.cancel().catch(() => {}); };
+	signal?.addEventListener("abort", abort, { once: true });
+	if (signal?.aborted) abort();
 	const decoder = new TextDecoder();
 	let buffer = "";
 
@@ -680,6 +684,8 @@ async function readUsageFromTee(body: ReadableStream<Uint8Array>): Promise<void>
 		while (true) {
 			const { done, value } = await reader.read();
 			if (done) break;
+			// A fulfilled read belongs to us even if abort fired before this
+			// continuation. Preserve complete records; discard only the tail.
 			buffer += decoder.decode(value, { stream: true });
 			const lines = buffer.split("\n");
 			buffer = lines.pop() || "";
@@ -690,7 +696,7 @@ async function readUsageFromTee(body: ReadableStream<Uint8Array>): Promise<void>
 	}
 
 	const trailing = (buffer + decoder.decode(new Uint8Array(0), { stream: false })).trim();
-	if (trailing) {
+	if (trailing && !signal?.aborted) {
 		if (trailing.startsWith("data: ")) {
 			processLine(trailing);
 		} else if (trailing.startsWith("{")) {
@@ -702,6 +708,7 @@ async function readUsageFromTee(body: ReadableStream<Uint8Array>): Promise<void>
 		}
 	}
 
+	signal?.removeEventListener("abort", abort);
 	try {
 		reader.releaseLock();
 	} catch {
@@ -746,7 +753,7 @@ function streamHypercharm(
 		if (!response.ok || !response.body) return response;
 
 		const [bodyForSdk, bodyForMeta] = response.body.tee();
-		trackTeeReader(readUsageFromTee(bodyForMeta));
+		trackTeeReader(readUsageFromTee(bodyForMeta, streamOptions.signal));
 		return new Response(bodyForSdk, {
 			headers: response.headers,
 			status: response.status,
@@ -773,6 +780,7 @@ let statusAbort: AbortController | null = null;
 let statusEpoch = 0;
 let lastCreditsFetchAt = 0;
 let creditsInFlight: Promise<void> | null = null;
+let metaInFlight: Promise<void> | null = null;
 let metaFetched = false;
 // Bumped on every successful /v1/credits read (lets the startup sync tell a
 // fresh balance from one adopted off disk).
@@ -803,56 +811,60 @@ async function fetchJsonGet(url: string, apiKey: string, signal: AbortSignal | u
 
 /** Canonical Hypercredit balance from /v1/credits. Throttled unless forced. */
 function refreshCredits(apiKey: string | undefined, signal: AbortSignal | undefined, force: boolean): Promise<void> {
-	if (!apiKey) return Promise.resolve();
+	if (!apiKey || signal?.aborted) return Promise.resolve();
+	if (creditsInFlight) return creditsInFlight;
 	if (!force && Date.now() - lastCreditsFetchAt < CREDITS_MIN_INTERVAL_MS) return Promise.resolve();
 	lastCreditsFetchAt = Date.now();
-	if (creditsInFlight) return creditsInFlight;
-	creditsInFlight = (async () => {
-		try {
-			const data = await fetchJsonGet(`${BASE_URL}/credits`, apiKey, signal, "Hypercredit balance");
-			if (data === null) return;
-			// /credits can report hypercredits ("balance") or USD ("balance_usd",
-			// USD-billed accounts). Handle both at the observed 20 hc = $1 rate so a
-			// server-side unit switch can never silently freeze the balance readout.
-			const rawBalance = typeof data?.balance === "number" ? data.balance : typeof data?.balance_usd === "number" ? data.balance_usd * 20 : undefined;
-			if (typeof rawBalance === "number" && Number.isFinite(rawBalance)) {
-				account.balance = rawBalance;
-				creditsOkCount += 1;
-			}
-		} finally {
-			creditsInFlight = null;
+	const epoch = statusEpoch;
+	const refresh = (async () => {
+		const data = await fetchJsonGet(`${BASE_URL}/credits`, apiKey, signal, "Hypercredit balance");
+		if (data === null || signal?.aborted || epoch !== statusEpoch) return;
+		// /credits can report hypercredits ("balance") or USD ("balance_usd",
+		// USD-billed accounts). Handle both at the observed 20 hc = $1 rate so a
+		// server-side unit switch can never silently freeze the balance readout.
+		const rawBalance = typeof data?.balance === "number" ? data.balance : typeof data?.balance_usd === "number" ? data.balance_usd * 20 : undefined;
+		if (typeof rawBalance === "number" && Number.isFinite(rawBalance)) {
+			account.balance = rawBalance;
+			creditsOkCount += 1;
 		}
-	})();
-	return creditsInFlight;
+	})().finally(() => { if (creditsInFlight === refresh) creditsInFlight = null; });
+	creditsInFlight = refresh;
+	return refresh;
 }
 
 /** Team name (/v1/teams) + OAuth device-session expiry (/v1/devices). */
-async function refreshAccountMeta(apiKey: string | undefined, signal?: AbortSignal): Promise<void> {
-	if (!apiKey || metaFetched) return;
-	const [teams, devices] = await Promise.all([
-		fetchJsonGet(`${BASE_URL}/teams`, apiKey, signal, "team metadata"),
-		fetchJsonGet(`${BASE_URL}/devices`, apiKey, signal, "device sessions"),
-	]);
-	if (signal?.aborted) return;
+function refreshAccountMeta(apiKey: string | undefined, signal?: AbortSignal): Promise<void> {
+	if (!apiKey || signal?.aborted || metaFetched) return Promise.resolve();
+	if (metaInFlight) return metaInFlight;
+	const epoch = statusEpoch;
+	const refresh = (async () => {
+		const [teams, devices] = await Promise.all([
+			fetchJsonGet(`${BASE_URL}/teams`, apiKey, signal, "team metadata"),
+			fetchJsonGet(`${BASE_URL}/devices`, apiKey, signal, "device sessions"),
+		]);
+		if (signal?.aborted || epoch !== statusEpoch) return;
 
-	const teamName = teams?.items?.[0]?.name;
-	if (typeof teamName === "string" && teamName.trim()) {
-		account.teamName = teamName.trim();
-	}
-
-	// Devices: the OAuth device flow registers this machine as
-	// `Pi (<hostname>)`. Match by name; skip silently for API-key auth
-	// (the endpoint returns OAuth sessions and may be empty).
-	if (Array.isArray(devices?.items)) {
-		const own = devices.items.find((d: any) => typeof d?.name === "string" && d.name === `Pi (${hostname()})`);
-		const expMs = own ? Date.parse(own.expires_at ?? "") : NaN;
-		if (!Number.isNaN(expMs)) {
-			authExpiresAtMs = expMs;
-			account.authDaysLeft = daysUntil(expMs);
+		const teamName = teams?.items?.[0]?.name;
+		if (typeof teamName === "string" && teamName.trim()) {
+			account.teamName = teamName.trim();
 		}
-	}
 
-	if (account.teamName !== null || account.authDaysLeft !== null) metaFetched = true;
+		// Devices: the OAuth device flow registers this machine as
+		// `Pi (<hostname>)`. Match by name; skip silently for API-key auth
+		// (the endpoint returns OAuth sessions and may be empty).
+		if (Array.isArray(devices?.items)) {
+			const own = devices.items.find((d: any) => typeof d?.name === "string" && d.name === `Pi (${hostname()})`);
+			const expMs = own ? Date.parse(own.expires_at ?? "") : NaN;
+			if (!Number.isNaN(expMs)) {
+				authExpiresAtMs = expMs;
+				account.authDaysLeft = daysUntil(expMs);
+			}
+		}
+
+		if (account.teamName !== null || account.authDaysLeft !== null) metaFetched = true;
+	})().finally(() => { if (metaInFlight === refresh) metaInFlight = null; });
+	metaInFlight = refresh;
+	return refresh;
 }
 
 function daysUntil(ms: number): number {
@@ -974,9 +986,10 @@ function updateStatus(ctx: ExtensionContext): void {
 // meanwhile (epoch bump) — its ctx is stale and the render is obsolete anyway.
 function updateStatusAfter(promise: Promise<void>, ctx: ExtensionContext): void {
 	const epoch = statusEpoch;
+	const signal = statusAbort?.signal;
 	void promise.then(() => {
-		if (epoch === statusEpoch) updateStatus(ctx);
-	});
+		if (epoch === statusEpoch && !signal?.aborted) updateStatus(ctx);
+	}).catch(() => { /* best-effort footer refresh; never block settlement */ });
 }
 
 function renderStatus(ctx: ExtensionContext): void {
@@ -1055,6 +1068,8 @@ function resetStatusState(): void {
 	pendingSawOutOfCredits = false;
 	outOfCreditsNotified = false;
 	lastCreditsFetchAt = 0;
+	creditsInFlight = null;
+	metaInFlight = null;
 	metaFetched = false;
 	authExpiresAtMs = null;
 }
@@ -1335,11 +1350,19 @@ export default function (pi: ExtensionAPI) {
 		if (!access) return;
 		cachedApiKey = access;
 		cachedSyncIdentity = typeof credentials.refresh === "string" && credentials.refresh ? oauthIdentity(credentials.refresh) : access;
-		// New account: team/device metadata and the throttle start over.
+		// A new credential must never join the old account's single flight or
+		// accept its late results (including the shared startup snapshot).
+		const epoch = ++statusEpoch;
+		statusAbort?.abort();
+		statusAbort = new AbortController();
+		creditsInFlight = null;
+		metaInFlight = null;
 		metaFetched = false;
 		lastCreditsFetchAt = 0;
-		const epoch = statusEpoch;
+		Object.assign(account, EMPTY_ACCOUNT);
+		authExpiresAtMs = null;
 		setTimeout(() => {
+			if (epoch !== statusEpoch) return;
 			// The new credentials supersede an in-flight revalidation, which must
 			// release its sync lock first, or this forced refresh would skip as "locked".
 			revalidateAbort?.abort();
@@ -1410,14 +1433,15 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 
-	pi.on("turn_end", async (_event, ctx) => {
+	pi.on("turn_end", async (event, ctx) => {
 		// Ensure every concurrent response tee has landed before committing.
 		await settleTeeReaders();
 		commitPending(ctx);
 		// If the session_start/model_select credits fetch raced or failed, retry
 		// once we have real activity so the very first turn shows the balance.
-		if (sessionStats.requests > 0 && account.balance === null) {
-			await refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false);
+		const aborted = ctx.signal?.aborted || (event.message?.role === "assistant" && event.message.stopReason === "aborted");
+		if (!aborted && sessionStats.requests > 0 && account.balance === null) {
+			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false), ctx);
 		}
 		updateStatus(ctx);
 	});
@@ -1426,15 +1450,18 @@ export default function (pi: ExtensionAPI) {
 	// compaction, or queued continuation can follow — the one moment polling
 	// /v1/credits is both fresh and not redundant. Gated on session activity
 	// so sessions without HyperCharm turns make zero API calls here.
-	pi.on("agent_settled", async (_event, ctx) => {
+	pi.on("agent_settled", (event, ctx) => {
+		// Account requests are cosmetic, not a condition for Pi to become idle.
+		// Prior HyperCharm activity can remain while another provider is active.
+		if (event.aborted || ctx.signal?.aborted) return;
 		if (sessionStats.requests > 0 || sessionStats.spendHc > 0) {
-			await refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false);
-			if (!metaFetched) await refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
-			updateStatus(ctx);
+			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, false), ctx);
+			updateStatusAfter(refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined), ctx);
 		}
 	});
 
 	pi.on("session_shutdown", (_event, ctx) => {
+		++statusEpoch;
 		revalidateAbort?.abort();
 		statusAbort?.abort();
 		ctx.ui.setStatus(STATUS_KEY_SESSION, undefined);
