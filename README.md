@@ -20,7 +20,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 ## Features
 
-- **26+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **27+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -51,6 +51,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 | Muse Spark Open | Text + Image | 1.0M | 1.0M | $1.40 | $4.65 |
 | Prism | Text + Image | 1.0M | 131K | $3.27 | $16.33 |
 | Prism Core | Text + Image | 1.0M | 131K | $1.52 | $4.79 |
+| Prism Flash | Text + Image | 1.0M | 131K | $0.33 | $1.31 |
 | Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
 | Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
 | Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
