@@ -49,7 +49,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 | MiniMax M2.7 | Text | 262K | 7K | $0.48 | $1.85 |
 | MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
 | Muse Spark Open | Text + Image | 1.0M | 1.0M | $1.40 | $4.65 |
-| Prism | Text + Image | 1.0M | 131K | $3.27 | $16.33 |
+| Prism | Text + Image | 1.0M | 131K | $2.20 | $11.00 |
 | Prism Core | Text + Image | 1.0M | 131K | $1.52 | $4.79 |
 | Prism Flash | Text + Image | 1.0M | 131K | $0.33 | $1.31 |
 | Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
