@@ -63,6 +63,38 @@
     }
   },
   {
+    "id": "deepseek-v4.1-flash-1017-basic",
+    "name": "DeepSeek V4.1 Flash 1017 (Basic)",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": null,
+      "minimal": null,
+      "low": "low",
+      "medium": null,
+      "high": "high",
+      "xhigh": null,
+      "max": "max"
+    },
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 0.2,
+      "output": 0.6,
+      "cacheRead": 0.01,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
     "id": "gemma-4-26b-a4b-it",
     "name": "Gemma 4 26B A4B",
     "reasoning": true,
