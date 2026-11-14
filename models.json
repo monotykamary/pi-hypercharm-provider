@@ -63,8 +63,8 @@
     }
   },
   {
-    "id": "deepseek-v4.1-flash-1017-basic",
-    "name": "DeepSeek V4.1 Flash 1017 (Basic)",
+    "id": "deepseek-v4.1-flash-1017-economy",
+    "name": "DeepSeek V4.1 Flash 1017 (Economy)",
     "reasoning": true,
     "thinkingLevelMap": {
       "off": null,
