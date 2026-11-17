@@ -20,7 +20,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 ## Features
 
-- **29+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **30+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -61,6 +61,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 | Qwen3.8-27B | Text + Image | 1.0M | 128K | $0.50 | $3.00 |
 | Qwen3.8-Flash | Text + Image | 1.0M | 128K | $0.15 | $0.47 |
 | Qwen3.8-Max | Text + Image | 1.0M | 66K | $2.00 | $6.00 |
+| Qwen4-Max | Text + Image | 1.0M | 128K | $1.50 | $4.50 |
 *Costs are per million tokens. Prices subject to change — check [hyper.charm.land](https://hyper.charm.land) for current pricing.*
 
 ## Installation

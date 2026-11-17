@@ -548,13 +548,13 @@
     "name": "Qwen3.8-Max",
     "reasoning": true,
     "thinkingLevelMap": {
-      "off": "off",
-      "minimal": null,
-      "low": null,
-      "medium": null,
-      "high": null,
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
       "xhigh": null,
-      "max": "max"
+      "max": null
     },
     "input": [
       "text",
@@ -570,7 +570,39 @@
     "maxTokens": 65536,
     "compat": {
       "supportsStore": false,
-      "supportsReasoningEffort": false,
+      "supportsReasoningEffort": true,
+      "thinkingFormat": "deepseek",
+      "maxTokensField": "max_tokens"
+    }
+  },
+  {
+    "id": "qwen4-max",
+    "name": "Qwen4-Max",
+    "reasoning": true,
+    "thinkingLevelMap": {
+      "off": "none",
+      "minimal": "minimal",
+      "low": "low",
+      "medium": "medium",
+      "high": "high",
+      "xhigh": null,
+      "max": null
+    },
+    "input": [
+      "text",
+      "image"
+    ],
+    "cost": {
+      "input": 1.5,
+      "output": 4.5,
+      "cacheRead": 0.075,
+      "cacheWrite": 0
+    },
+    "contextWindow": 1000000,
+    "maxTokens": 128000,
+    "compat": {
+      "supportsStore": false,
+      "supportsReasoningEffort": true,
       "thinkingFormat": "deepseek",
       "maxTokensField": "max_tokens"
     }
