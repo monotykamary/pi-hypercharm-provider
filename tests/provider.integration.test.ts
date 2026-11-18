@@ -209,7 +209,8 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 			if (/\.(ts|json)$/.test(file)) copyFileSync(path.join(sourceDir, file), path.join(fixtureDir, file));
 		}
 		const graceNow = Date.UTC(2026, 0, 15);
-		const base = JSON.parse(readFileSync(embeddedModelsPath, "utf8"))[0];
+		const base = { ...JSON.parse(readFileSync(embeddedModelsPath, "utf8"))[0], id: "fixture-embedded-model" };
+		writeFileSync(path.join(fixtureDir, "models.json"), JSON.stringify([base]));
 		const deprecated = {
 			fresh: { ...base, id: "fixture-grace-fresh", deprecatedAt: new Date(graceNow - DEPRECATED_TTL_MS).toISOString() },
 			stale: { ...base, id: "fixture-grace-stale", deprecatedAt: new Date(graceNow - DEPRECATED_TTL_MS - 1).toISOString() },
@@ -218,11 +219,11 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		writeFileSync(path.join(fixtureDir, "deprecated-models.json"), JSON.stringify(deprecated));
 		harness = await load({ catalogNow: graceNow, extensionPaths: [path.join(fixtureDir, "index.ts")] });
 
-		const embedded = harness.runtime.getModel("hypercharm", "deepseek-v4-flash-0731");
+		const embedded = harness.runtime.getModel("hypercharm", base.id);
 		assert.ok(embedded, "embedded catalog must register without any network");
-		assert.equal(embedded.contextWindow, 1000000);
-		assert.equal(embedded.maxTokens, 384000);
-		assert.equal(embedded.cost.input, 0.44);
+		assert.equal(embedded.contextWindow, base.contextWindow);
+		assert.equal(embedded.maxTokens, base.maxTokens);
+		assert.equal(embedded.cost.input, base.cost.input);
 		assert.equal(EMBEDDED_AUTHORITY_NOTE, "tests must run against the embedded catalog");
 
 		// Deprecated grace: entries inside the 14-day TTL are still served,
@@ -247,7 +248,7 @@ test("loads offline: embedded catalog, deprecated grace, namespaced registration
 		}
 
 		// Namespacing: nothing is registered on the official provider's surfaces.
-		assert.equal(harness.runtime.getModel("hyper", "deepseek-v4-flash-0731"), undefined, "must not register the official provider id");
+		assert.equal(harness.runtime.getModel("hyper", base.id), undefined, "must not register the official provider id");
 		assert.equal(harness.runner.getEntryRenderer("hyper-prism-route"), undefined, "must not register the official entry type");
 		assert.ok(harness.runner.getEntryRenderer(PRISM_ENTRY_TYPE), "prism entry renderer registered");
 		const commandNames = harness.runner.getRegisteredCommands().map((command) => command.name);
