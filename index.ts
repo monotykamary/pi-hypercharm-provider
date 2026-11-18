@@ -158,6 +158,7 @@ import {
 	type StatusConfig,
 } from "./status";
 import fs from "fs";
+import { updateSettingsFile } from "./settings-file";
 import { hostname } from "os";
 import path from "path";
 import {
@@ -581,24 +582,13 @@ function loadStatusConfig(): StatusConfig {
 	return statusConfig;
 }
 
-function writeStatusConfig(): void {
+function writeStatusConfig(change: Partial<StatusConfig> | ((current: StatusConfig) => Partial<StatusConfig>)): void {
+	const patch = (current: StatusConfig) => typeof change === "function" ? change(current) : change;
 	try {
-		let raw: Record<string, unknown> = {};
-		try {
-			const existing = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
-			if (existing && typeof existing === "object" && !Array.isArray(existing)) raw = existing;
-		} catch {
-			// No existing file — start fresh
-		}
-		raw.session = statusConfig.session;
-		raw.account = statusConfig.account;
-		raw.hideOnOtherProvider = statusConfig.hideOnOtherProvider;
-		raw.lowBalanceHc = statusConfig.lowBalanceHc;
-		raw.glyphs = statusConfig.glyphs;
-		fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
-		fs.writeFileSync(CONFIG_PATH, JSON.stringify(raw, null, 2) + "\n");
+		const saved = updateSettingsFile(CONFIG_PATH, (raw) => ({ ...raw, ...patch(coerceStatusConfig(raw)) }));
+		statusConfig = coerceStatusConfig(saved);
 	} catch (err) {
-		// Non-fatal: the in-memory config still applies to this session.
+		statusConfig = { ...statusConfig, ...patch(statusConfig) };
 		notifier.warn(`Could not save the HyperCharm status config to ${CONFIG_PATH}: ${describeError(err)}.`);
 	}
 }
@@ -1140,8 +1130,7 @@ async function handleStatusCommand(args: string, ctx: ExtensionContext): Promise
 	}
 
 	if (key === "reset" && tokens.length === 1) {
-		statusConfig = { ...DEFAULT_STATUS_CONFIG };
-		writeStatusConfig();
+		writeStatusConfig(DEFAULT_STATUS_CONFIG);
 		updateStatus(ctx);
 		ctx.ui.notify(`HyperCharm status reset. ${statusSummary()}`, "info");
 		return;
@@ -1152,8 +1141,7 @@ async function handleStatusCommand(args: string, ctx: ExtensionContext): Promise
 			ctx.ui.notify(STATUS_USAGE, "error");
 			return;
 		}
-		statusConfig[key] = value;
-		writeStatusConfig();
+		writeStatusConfig({ [key]: value });
 		if (value !== "off" && key === "account") {
 			// Turning account on: make sure we have data to show
 			updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true), ctx);
@@ -1169,25 +1157,19 @@ async function handleStatusCommand(args: string, ctx: ExtensionContext): Promise
 			ctx.ui.notify(STATUS_USAGE, "error");
 			return;
 		}
-		statusConfig.hideOnOtherProvider = value === "true";
-		writeStatusConfig();
+		writeStatusConfig({ hideOnOtherProvider: value === "true" });
 		updateStatus(ctx);
 		ctx.ui.notify(`HyperCharm status. ${statusSummary()}`, "info");
 		return;
 	}
 
 	if (key === "lowbalance" && tokens.length === 2) {
-		if (value === "off") {
-			statusConfig.lowBalanceHc = null;
-		} else {
-			const n = Number(value);
-			if (!Number.isFinite(n) || n <= 0) {
-				ctx.ui.notify(STATUS_USAGE, "error");
-				return;
-			}
-			statusConfig.lowBalanceHc = n;
+		const threshold = value === "off" ? null : Number(value);
+		if (threshold !== null && (!Number.isFinite(threshold) || threshold <= 0)) {
+			ctx.ui.notify(STATUS_USAGE, "error");
+			return;
 		}
-		writeStatusConfig();
+		writeStatusConfig({ lowBalanceHc: threshold });
 		updateStatus(ctx);
 		ctx.ui.notify(`HyperCharm status. ${statusSummary()}`, "info");
 		return;
@@ -1198,8 +1180,7 @@ async function handleStatusCommand(args: string, ctx: ExtensionContext): Promise
 			ctx.ui.notify(STATUS_USAGE, "error");
 			return;
 		}
-		statusConfig.glyphs = value;
-		writeStatusConfig();
+		writeStatusConfig({ glyphs: value });
 		updateStatus(ctx);
 		ctx.ui.notify(`HyperCharm status. ${statusSummary()}`, "info");
 		return;
@@ -1212,7 +1193,7 @@ async function configureStatusInteractive(ctx: ExtensionContext): Promise<void> 
 	const modes = ["widget", "statusbar", "off"] as const;
 	const nextMode = (m: string) => modes[(modes.indexOf(m as any) + 1) % modes.length];
 	const glyphModes = ["auto", "unicode", "ascii"] as const;
-	const nextGlyphMode = () => glyphModes[(glyphModes.indexOf(statusConfig.glyphs as any) + 1) % glyphModes.length];
+	const nextGlyphMode = (glyphs: StatusConfig["glyphs"]) => glyphModes[(glyphModes.indexOf(glyphs) + 1) % glyphModes.length];
 
 	for (;;) {
 		const lb = statusConfig.lowBalanceHc === null ? "off" : `${statusConfig.lowBalanceHc} hc`;
@@ -1239,13 +1220,11 @@ async function configureStatusInteractive(ctx: ExtensionContext): Promise<void> 
 			return;
 		}
 		if (choice === sessionOpt) {
-			statusConfig.session = nextMode(statusConfig.session);
-			writeStatusConfig();
+			writeStatusConfig((current) => ({ session: nextMode(current.session) }));
 			continue;
 		}
 		if (choice === accountOpt) {
-			statusConfig.account = nextMode(statusConfig.account);
-			writeStatusConfig();
+			writeStatusConfig((current) => ({ account: nextMode(current.account) }));
 			if (statusConfig.account !== "off") {
 				updateStatusAfter(refreshCredits(cachedApiKey, statusAbort?.signal ?? undefined, true), ctx);
 				void refreshAccountMeta(cachedApiKey, statusAbort?.signal ?? undefined);
@@ -1253,8 +1232,7 @@ async function configureStatusInteractive(ctx: ExtensionContext): Promise<void> 
 			continue;
 		}
 		if (choice === hideOpt) {
-			statusConfig.hideOnOtherProvider = !statusConfig.hideOnOtherProvider;
-			writeStatusConfig();
+			writeStatusConfig((current) => ({ hideOnOtherProvider: !current.hideOnOtherProvider }));
 			updateStatus(ctx);
 			continue;
 		}
@@ -1264,15 +1242,13 @@ async function configureStatusInteractive(ctx: ExtensionContext): Promise<void> 
 			const ordered = presets.includes(current) ? presets : [current, ...presets];
 			const pick = await ctx.ui.select("Warn at/below balance (hc)", ordered);
 			if (pick !== undefined) {
-				statusConfig.lowBalanceHc = pick === "off" ? null : Number(pick);
-				writeStatusConfig();
+				writeStatusConfig({ lowBalanceHc: pick === "off" ? null : Number(pick) });
 				updateStatus(ctx);
 			}
 			continue;
 		}
 		if (choice === glyphOpt) {
-			statusConfig.glyphs = nextGlyphMode();
-			writeStatusConfig();
+			writeStatusConfig((current) => ({ glyphs: nextGlyphMode(current.glyphs) }));
 			updateStatus(ctx);
 			continue;
 		}
