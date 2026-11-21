@@ -20,7 +20,7 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 ## Features
 
-- **30+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
+- **21+ AI Models** including DeepSeek V4 Flash/Pro, GLM 5/5.1, Kimi K2.5/K2.6, Qwen3.6/3.7, MiniMax M2.7, Gemma 4, GPT-OSS, and Llama
 - **DeepSeek Native Thinking** — Uses the `deepseek` thinking format for Charm Hyper requests, with native `reasoning_effort` on models that publish levels
 - **OpenAI-compatible API** via Charm Hyper's `/v1/chat/completions` endpoint
 - **OAuth Device Flow** — sign in with `/login` under the `hypercharm` provider (independent of the official provider's `hyper` registration)
@@ -32,31 +32,22 @@ Run `bun run test:pi` for offline manifest, catalog, lifecycle and streaming che
 
 | Model | Type | Context | Max Tokens | Input Cost | Output Cost |
 |-------|------|---------|------------|------------|-------------|
-| DeepSeek V4 Flash 0731 | Text | 1.0M | 384K | $0.44 | $1.32 |
 | DeepSeek V4 Pro 0813 | Text | 1.0M | 262K | $1.44 | $4.31 |
-| DeepSeek V4.1 Flash | Text + Image | 1.0M | 262K | $0.33 | $1.31 |
 | DeepSeek V4.1 Flash 1017 | Text + Image | 1.0M | 262K | $0.33 | $1.31 |
 | DeepSeek V4.1 Flash 1017 (Basic) | Text + Image | 1.0M | 384K | $0.20 | $0.60 |
 | DeepSeek V4.1 Flash 1017 (Economy) | Text + Image | 1.0M | 384K | $0.20 | $0.60 |
 | Gemma 4 26B A4B | Text | 256K | 26K | $0.10 | $0.33 |
 | GLM 5.3 | Text | 1.0M | 128K | $1.52 | $4.79 |
 | GLM 5.3 Flash | Text + Image | 1.0M | 131K | $0.16 | $0.54 |
-| GLM-5.2 | Text | 1.0M | 33K | $1.52 | $4.79 |
 | gpt-oss-120b | Text | 131K | 13K | $0.18 | $0.68 |
 | Inkling | Text + Image | 1.0M | 66K | $1.09 | $4.41 |
-| Kimi K2 Thinking | Text | 262K | 26K | $0.60 | $2.50 |
-| Kimi K2.7 Code | Text + Image | 256K | 16K | $1.03 | $4.36 |
 | Kimi K3 | Text + Image | 1.0M | 16K | $3.27 | $16.33 |
 | Kimi K3.1 Pro | Text + Image | 1.0M | 262K | $2.20 | $11.00 |
-| MiniMax M2.7 | Text | 262K | 7K | $0.48 | $1.85 |
 | MiniMax M3 | Text + Image | 512K | 512K | $0.33 | $1.31 |
 | Muse Spark Open | Text + Image | 1.0M | 1.0M | $1.40 | $4.65 |
 | Prism | Text + Image | 1.0M | 131K | $2.20 | $11.00 |
 | Prism Core | Text + Image | 1.0M | 131K | $1.52 | $4.79 |
 | Prism Flash | Text + Image | 1.0M | 131K | $0.33 | $1.31 |
-| Qwen3.7-Flash | Text + Image | 1.0M | 64K | $0.20 | $0.80 |
-| Qwen3.7-Max | Text | 1.0M | 64K | $2.50 | $7.50 |
-| Qwen3.7-Plus | Text + Image | 1.0M | 64K | $1.20 | $4.80 |
 | Qwen3.8-2.4T-A95B | Text | 1.0M | 128K | $2.00 | $6.00 |
 | Qwen3.8-27B | Text + Image | 1.0M | 128K | $0.50 | $3.00 |
 | Qwen3.8-Flash | Text + Image | 1.0M | 128K | $0.15 | $0.47 |
